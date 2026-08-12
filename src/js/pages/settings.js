@@ -1,5 +1,5 @@
 import { requireSession } from "../auth/guards.js";
-import { bindLogout } from "../auth/logout.js";
+import { bindLogout } from "../auth/logout.js?v=20260812-nav";
 import { listGradingScales } from "../services/grading.service.js";
 import { getProfile, updateProfile } from "../services/profile.service.js";
 import { el } from "../utils/dom.js";

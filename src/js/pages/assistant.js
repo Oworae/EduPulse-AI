@@ -1,5 +1,5 @@
 import { requireSession } from "../auth/guards.js";
-import { bindLogout } from "../auth/logout.js";
+import { bindLogout } from "../auth/logout.js?v=20260812-nav";
 import { createConversation, listConversations, listMessages, sendCoachMessage } from "../services/chat.service.js";
 import { getCurrentSemester } from "../services/semester.service.js";
 import { el, formattedText } from "../utils/dom.js";

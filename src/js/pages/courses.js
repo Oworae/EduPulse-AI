@@ -1,5 +1,5 @@
 import { requireSession } from "../auth/guards.js";
-import { bindLogout } from "../auth/logout.js";
+import { bindLogout } from "../auth/logout.js?v=20260812-nav";
 import { createCourse, deleteCourse, listCurrentCourses, updateCourse } from "../services/course.service.js";
 import { getCurrentSemester } from "../services/semester.service.js";
 import { el, formatPercent } from "../utils/dom.js";

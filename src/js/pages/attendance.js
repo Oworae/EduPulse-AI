@@ -1,5 +1,5 @@
 import { requireSession } from "../auth/guards.js";
-import { bindLogout } from "../auth/logout.js";
+import { bindLogout } from "../auth/logout.js?v=20260812-nav";
 import { recomputePulseQuietly } from "../services/analytics.service.js";
 import { deleteAttendance, listAttendance, saveAttendance } from "../services/attendance.service.js";
 import { getCourse } from "../services/course.service.js";

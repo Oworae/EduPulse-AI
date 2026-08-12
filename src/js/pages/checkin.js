@@ -1,5 +1,5 @@
 import { requireSession } from "../auth/guards.js";
-import { bindLogout } from "../auth/logout.js";
+import { bindLogout } from "../auth/logout.js?v=20260812-nav";
 import { recomputePulseQuietly } from "../services/analytics.service.js";
 import { currentWeekStart, getCheckin, listCheckins, saveCheckin } from "../services/checkin.service.js";
 import { getCurrentSemester } from "../services/semester.service.js";
