@@ -2,6 +2,16 @@
 
 Supabase/PostgreSQL foundation for the student-owned EduPulse AI academic tracker. Raw academic calculations are deterministic; Gemini only explains computed context through authenticated Edge Functions.
 
+## Frontend
+
+The first vanilla JavaScript slice includes the landing page, self-service email/password registration, login, guarded onboarding, personal grading-scale setup, first-semester creation, and an initial dashboard. Serve the repository root over HTTP because browser ES modules do not run reliably from `file://` URLs:
+
+```sh
+python3 -m http.server 8080
+```
+
+Then open `http://localhost:8080`. The browser contains only the Supabase project URL and publishable key; RLS remains the authorization boundary.
+
 ## Local verification
 
 Requirements: Supabase CLI and Docker Desktop.

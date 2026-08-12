@@ -58,3 +58,26 @@ jobs:
             echo 'A backend credential appears to be committed.' >&2
             exit 1
           fi
+
+  frontend:
+    name: Frontend checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check browser module syntax
+        run: find src/js -name '*.js' -print0 | xargs -0 -n1 node --check
+      - name: Verify required pages
+        run: |
+          for page in index.html signup.html login.html onboarding.html dashboard.html; do
+            test -s "$page"
+          done
+      - name: Reject backend credentials in frontend
+        run: |
+          if git grep -nE '(SUPABASE_SERVICE_ROLE_KEY|GEMINI_API_KEY|sb_secret_|postgresql://)' -- '*.html' 'src/**'; then
+            echo 'A backend credential appears in frontend source.' >&2
+            exit 1
+          fi
