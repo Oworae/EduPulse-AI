@@ -1,22 +1,24 @@
-import { supabase } from "../config/supabase.js";
-
-async function responseMessage(error) {
-  const response = error?.context;
-  if (!response || typeof response.clone !== "function") return error?.message || "The server request failed.";
-  try {
-    const payload = await response.clone().json();
-    if (typeof payload?.error === "string" && payload.error.trim()) return payload.error;
-    if (typeof payload?.message === "string" && payload.message.trim()) return payload.message;
-  } catch {
-    try { const text = await response.clone().text(); if (text.trim()) return text.slice(0, 240); } catch { /* use fallback */ }
-  }
-  return error?.message || `The server request failed (${response.status ?? "unknown status"}).`;
-}
+import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL, supabase } from "../config/supabase.js";
 
 export async function invokeFunction(name, body) {
   const { data: { session }, error: sessionError } = await supabase.auth.getSession();
   if (sessionError || !session) throw new Error("Your session has expired. Please sign in again.");
-  const { data, error } = await supabase.functions.invoke(name, { body });
-  if (error) throw new Error(await responseMessage(error));
-  return data;
+  const response = await fetch(`${SUPABASE_URL}/functions/v1/${encodeURIComponent(name)}`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${session.access_token}`,
+      "apikey": SUPABASE_PUBLISHABLE_KEY,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+  const text = await response.text();
+  let payload;
+  try { payload = text ? JSON.parse(text) : null; } catch { payload = null; }
+  if (!response.ok) {
+    const serverMessage = payload?.error || payload?.message || payload?.msg;
+    throw new Error(typeof serverMessage === "string" && serverMessage.trim() ? serverMessage : `Server request failed (${response.status}).`);
+  }
+  if (!payload) throw new Error("The server returned an empty response.");
+  return payload;
 }
