@@ -12,6 +12,8 @@ python3 -m http.server 8080
 
 Then open `http://localhost:8080`. The browser contains only the Supabase project URL and publishable key; RLS remains the authorization boundary.
 
+Production frontend: `https://oworae.github.io/EduPulse-AI/`. GitHub Actions publishes only HTML and `src/` frontend assets; migrations, tests, and backend code are excluded from the Pages artifact.
+
 ## Local verification
 
 Requirements: Supabase CLI and Docker Desktop.

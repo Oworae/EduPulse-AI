@@ -11,7 +11,7 @@ form.addEventListener("submit", async (event) => {
   setBusy(submit, true, "Creating account…");
   const { data, error } = await supabase.auth.signUp({
     email: String(values.get("email")).trim(), password: String(password),
-    options: { data: { full_name: String(values.get("full_name")).trim() }, emailRedirectTo: `${location.origin}/login.html` },
+    options: { data: { full_name: String(values.get("full_name")).trim() }, emailRedirectTo: new URL("login.html", location.href).href },
   });
   setBusy(submit, false);
   if (error) return showMessage(error.message, "error");
