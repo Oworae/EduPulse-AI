@@ -4,7 +4,7 @@ export async function callGemini(
   jsonMode = false,
 ): Promise<string> {
   const key = Deno.env.get("GEMINI_API_KEY");
-  const model = Deno.env.get("GEMINI_MODEL") ?? "gemini-2.5-flash";
+  const model = Deno.env.get("GEMINI_MODEL") ?? "gemini-3.6-flash";
   if (!key) throw new Error("Gemini is not configured");
   const response = await fetch(
     `${endpoint}/${model}:generateContent?key=${encodeURIComponent(key)}`,
@@ -43,5 +43,5 @@ export async function callGemini(
   return text.trim();
 }
 export function modelName() {
-  return Deno.env.get("GEMINI_MODEL") ?? "gemini-2.5-flash";
+  return Deno.env.get("GEMINI_MODEL") ?? "gemini-3.6-flash";
 }

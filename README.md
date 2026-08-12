@@ -38,6 +38,8 @@ If Docker is unavailable locally, [Backend CI](.github/workflows/backend-ci.yml)
 
 Set `GEMINI_API_KEY` and optionally `GEMINI_MODEL` as Supabase project secrets. The service-role key and Gemini key must never be placed in frontend files. All functions verify the bearer token and derive the user ID from the verified session.
 
+The production default is `gemini-3.6-flash`, a generally available model supported by Gemini's GenerateContent API.
+
 ## Security decisions
 
 - Every public table has RLS enabled.
