@@ -1,1 +1,157 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Course — EduPulse AI</title><link rel="icon" type="image/png" href="src/assets/brand/edupulse-icon-v2.png"><link rel="stylesheet" href="src/css/courses.css?v=20260812-nav"></head><body><main class="dashboard shell"><header class="dash-header"><a class="brand" href="dashboard.html"><img class="brand-mark" src="src/assets/brand/edupulse-icon-v2.png" alt="">EduPulse AI</a></header><section class="course-hero"><div><a class="context-link" href="courses.html">← All courses</a><div id="course-code" class="eyebrow"></div><h1 id="course-name">Course</h1><p id="course-meta" class="muted"></p></div><aside class="performance-card card"><span>Current performance</span><strong id="performance">—</strong><small id="completed-weight" class="muted"></small></aside></section><div class="section-bar"><div><h2>Assessments</h2><p class="muted">Planned work is never counted as zero.</p></div><div class="section-actions"><a id="attendance-link" class="button secondary" href="#">Attendance</a><button id="add-assessment" class="button" type="button">Add assessment</button></div></div><section id="assessment-list" class="assessment-list" aria-live="polite"></section></main><dialog id="assessment-dialog" class="modal"><div class="modal-inner"><div class="modal-head"><h2 id="assessment-dialog-title">Add assessment</h2><button id="close-assessment-dialog" class="icon-button" type="button" aria-label="Close">×</button></div><p id="form-message" class="message" hidden aria-live="polite"></p><form id="assessment-form"><input name="assessment_id" type="hidden"><div class="form-grid"><div class="field span-2"><label for="assessment-title">Title</label><input id="assessment-title" name="title" maxlength="160" required></div><div class="field"><label for="assessment-type">Type</label><select id="assessment-type" name="assessment_type"><option value="quiz">Quiz</option><option value="assignment">Assignment</option><option value="midsem">Mid-semester exam</option><option value="project">Project</option><option value="presentation">Presentation</option><option value="practical">Practical</option><option value="final_exam">Final exam</option><option value="other">Other</option></select></div><div class="field"><label for="assessment-status">Status</label><select id="assessment-status" name="status"><option value="planned">Planned</option><option value="completed">Completed</option></select></div><div class="field"><label for="weight">Weight (%)</label><input id="weight" name="weight_percentage" type="number" min="0.01" max="100" step="0.01" required></div><div class="field"><label for="scheduled-date">Scheduled date</label><input id="scheduled-date" name="scheduled_date" type="date"></div><div id="score-fields" class="span-2 form-grid" hidden><div class="field"><label for="score">Score</label><input id="score" name="score" type="number" min="0" step="0.01"></div><div class="field"><label for="max-score">Maximum score</label><input id="max-score" name="max_score" type="number" min="0.01" step="0.01"></div><div class="field span-2"><label for="completed-date">Completed date</label><input id="completed-date" name="completed_date" type="date"></div></div></div><div class="modal-actions"><button class="button" type="submit">Save assessment</button></div></form></div></dialog><script type="module">const id=new URLSearchParams(location.search).get("id");document.querySelector("#attendance-link").href=`attendance.html?id=${encodeURIComponent(id??"")}`;</script><script type="module" src="src/js/pages/course-detail.js?v=20260812-nav"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#184f3b">
+  <title>Course — EduPulse AI</title>
+  <link rel="icon" type="image/png" href="src/assets/brand/edupulse-icon-v2.png">
+  <link rel="stylesheet" href="src/css/courses.css?v=20260812-course-workspace">
+</head>
+<body class="course-detail-page">
+  <a class="app-skip-link" href="#main-content">Skip to course workspace</a>
+  <main id="main-content" class="dashboard shell" tabindex="-1" aria-busy="true">
+    <header class="dash-header">
+      <a class="brand" href="dashboard.html"><img class="brand-mark" src="src/assets/brand/edupulse-icon-v2.png" alt="">EduPulse AI</a>
+    </header>
+
+    <section id="course-page-state" class="course-detail-state card" role="alert" hidden>
+      <div class="state-mark">!</div>
+      <p class="eyebrow">Course unavailable</p>
+      <h1 id="course-state-title">We couldn’t open this course.</h1>
+      <p id="course-state-copy">The course may have been removed, or your connection may have dropped.</p>
+      <div><button id="retry-course" class="button" type="button">Try again</button><a class="button secondary" href="courses.html">Back to courses</a></div>
+    </section>
+
+    <div id="course-content">
+      <div class="course-detail-toolbar">
+        <a class="context-link" href="courses.html"><span aria-hidden="true">←</span>All courses</a>
+        <div class="course-detail-actions">
+          <a id="attendance-link" class="button secondary" href="courses.html">Attendance</a>
+          <button id="add-assessment" class="button" type="button"><span aria-hidden="true">＋</span>Add assessment</button>
+        </div>
+      </div>
+
+      <section class="course-command-grid" aria-label="Course summary">
+        <article class="course-performance-command">
+          <header class="course-performance-head">
+            <div><span>Course command center</span><small id="course-code">Loading course…</small></div>
+            <span id="course-status-pill" class="course-status-pill">Building context</span>
+          </header>
+          <div class="course-performance-body">
+            <div class="course-title-block">
+              <h1 id="course-name">Your course</h1>
+              <p id="course-meta">Loading course details…</p>
+              <div class="course-target-track" id="course-performance-track" role="progressbar" aria-label="Average on graded work" aria-valuemin="0" aria-valuemax="100">
+                <span id="performance-bar"></span><i id="target-marker" hidden></i>
+              </div>
+              <div class="course-target-caption"><span id="performance-context">Waiting for recorded results</span><strong id="course-target-gap">—</strong></div>
+            </div>
+            <div id="performance-ring" class="course-performance-ring">
+              <div><strong id="performance">—</strong><span>Average on<br>graded work</span></div>
+            </div>
+          </div>
+        </article>
+
+        <aside class="course-next-card">
+          <div class="course-next-head"><span>Your next move</span><b aria-hidden="true">↗</b></div>
+          <div id="next-move-icon" class="course-next-icon" aria-hidden="true">01</div>
+          <p id="next-move-kicker" class="course-next-kicker">Building your next move</p>
+          <h2 id="next-move-title">Turning course evidence into one clear action…</h2>
+          <p id="next-move-copy">Your recorded assessments, target, and attendance will shape this recommendation.</p>
+          <button id="next-move-action" class="course-next-action" type="button">Add an assessment <span aria-hidden="true">→</span></button>
+        </aside>
+      </section>
+
+      <section class="course-metric-strip" aria-label="Course metrics">
+        <article><div><span>Target</span><i aria-hidden="true">◎</i></div><strong id="target-metric">—</strong><p id="target-metric-copy">No target set</p></article>
+        <article><div><span>Graded coverage</span><i aria-hidden="true">✓</i></div><strong id="completed-weight">—</strong><p id="coverage-copy">No results recorded</p></article>
+        <article><div><span>Attendance</span><i aria-hidden="true">◷</i></div><strong id="attendance-metric">—</strong><p id="attendance-copy">No sessions recorded</p></article>
+        <article><div><span>Assessments</span><i aria-hidden="true">#</i></div><strong id="assessment-count">—</strong><p id="assessment-count-copy">Loading assessment plan</p></article>
+      </section>
+
+      <nav class="course-local-nav" aria-label="Course sections"><a class="active" href="#assessment-workspace" aria-current="page">Overview</a><a id="attendance-tab" href="courses.html">Attendance</a></nav>
+
+      <section id="assessment-workspace" class="course-assessment-layout">
+        <article class="assessment-workspace card">
+          <header class="assessment-workspace-head">
+            <div><p class="eyebrow">Coursework</p><h2>Assessment plan</h2><p>Planned work is never counted as zero.</p></div>
+            <button id="add-assessment-secondary" class="button secondary" type="button"><span aria-hidden="true">＋</span>Add assessment</button>
+          </header>
+          <div class="assessment-allocation">
+            <div><span>Course weight allocated</span><strong id="allocated-weight">—</strong></div>
+            <div id="allocation-track" class="allocation-track" role="progressbar" aria-label="Course assessment weight allocated" aria-valuemin="0" aria-valuemax="100"><span id="allocation-bar"></span></div>
+            <p id="allocation-context">Loading the assessment structure…</p>
+          </div>
+          <div id="assessment-filter" class="assessment-filter" role="group" aria-label="Filter assessments" hidden>
+            <button class="active" type="button" data-assessment-filter="all" aria-pressed="true">All</button>
+            <button type="button" data-assessment-filter="planned" aria-pressed="false">Planned</button>
+            <button type="button" data-assessment-filter="completed" aria-pressed="false">Results</button>
+          </div>
+          <section id="assessment-list" class="assessment-list assessment-list-loading" aria-live="polite" aria-label="Assessment plan">
+            <div class="assessment-row-skeleton" aria-hidden="true"></div>
+            <div class="assessment-row-skeleton" aria-hidden="true"></div>
+            <div class="assessment-row-skeleton" aria-hidden="true"></div>
+          </section>
+        </article>
+
+        <aside class="course-evidence-stack">
+          <article class="target-path-card card">
+            <div class="target-path-top"><span>Target path</span><i aria-hidden="true">↗</i></div>
+            <strong id="target-path-value">—</strong>
+            <h2 id="target-path-title">Waiting for course evidence</h2>
+            <p id="target-path-copy">Once a target and assessment results are available, your path will become clearer.</p>
+            <small>Based only on the course weight and results you have recorded.</small>
+          </article>
+          <article class="course-truth-card">
+            <span class="course-truth-mark" aria-hidden="true">✦</span>
+            <div><p>Need to unpack a result?</p><strong>Talk it through with your academic coach.</strong></div>
+            <a href="assistant.html" aria-label="Open academic coach">→</a>
+          </article>
+        </aside>
+      </section>
+    </div>
+  </main>
+
+  <dialog id="assessment-dialog" class="modal assessment-form-dialog" aria-labelledby="assessment-dialog-title" aria-describedby="assessment-dialog-copy">
+    <div class="modal-inner">
+      <div class="modal-head">
+        <div><p class="modal-kicker">Assessment details</p><h2 id="assessment-dialog-title">Add assessment</h2></div>
+        <button id="close-assessment-dialog" class="icon-button" type="button" aria-label="Close assessment form">×</button>
+      </div>
+      <p id="assessment-dialog-copy" class="modal-copy">Plan upcoming work or record a completed result. Planned assessments never reduce your current average.</p>
+      <p id="form-message" class="message" hidden aria-live="polite"></p>
+      <form id="assessment-form">
+        <input name="assessment_id" type="hidden">
+        <div class="form-grid">
+          <div class="field span-2"><label for="assessment-title">Assessment title</label><input id="assessment-title" name="title" maxlength="160" placeholder="Mid-semester exam" autocomplete="off" required></div>
+          <div class="field"><label for="assessment-type">Type</label><select id="assessment-type" name="assessment_type"><option value="quiz">Quiz</option><option value="assignment">Assignment</option><option value="midsem">Mid-semester exam</option><option value="project">Project</option><option value="presentation">Presentation</option><option value="practical">Practical</option><option value="final_exam">Final exam</option><option value="other">Other</option></select></div>
+          <div class="field"><label for="assessment-status">Status</label><select id="assessment-status" name="status"><option value="planned">Planned</option><option value="completed">Completed</option></select></div>
+          <div class="field"><label for="weight">Course weight (%)</label><input id="weight" name="weight_percentage" type="number" min="0.01" max="100" step="0.01" inputmode="decimal" required><small id="weight-helper">Up to 100% is available.</small></div>
+          <div class="field"><label for="scheduled-date">Scheduled date <span class="field-optional">Optional</span></label><input id="scheduled-date" name="scheduled_date" type="date"></div>
+          <div id="score-fields" class="span-2 form-grid" hidden>
+            <div class="field"><label for="score">Score earned</label><input id="score" name="score" type="number" min="0" step="0.01" inputmode="decimal"></div>
+            <div class="field"><label for="max-score">Maximum score</label><input id="max-score" name="max_score" type="number" min="0.01" step="0.01" inputmode="decimal"></div>
+            <div class="field span-2"><label for="completed-date">Completed date</label><input id="completed-date" name="completed_date" type="date"><small id="score-preview">Enter the score and maximum to preview the result.</small></div>
+          </div>
+        </div>
+        <div class="modal-actions"><button id="cancel-assessment-form" class="button secondary" type="button">Cancel</button><button class="button" type="submit">Save assessment</button></div>
+      </form>
+    </div>
+  </dialog>
+
+  <dialog id="delete-assessment-dialog" class="modal destructive-dialog" aria-labelledby="delete-assessment-title" aria-describedby="delete-assessment-copy">
+    <div class="modal-inner">
+      <div class="destructive-mark" aria-hidden="true">!</div>
+      <p class="modal-kicker">Permanent action</p>
+      <h2 id="delete-assessment-title">Delete this assessment?</h2>
+      <p id="delete-assessment-copy" class="modal-copy">This result or plan will be removed from the course and its academic picture.</p>
+      <p id="delete-assessment-message" class="message error" hidden aria-live="polite"></p>
+      <div class="modal-actions"><button id="cancel-assessment-delete" class="button secondary" type="button">Keep assessment</button><button id="confirm-assessment-delete" class="button danger-button" type="button">Delete assessment</button></div>
+    </div>
+  </dialog>
+
+  <div id="course-toast" class="course-toast" role="status" aria-live="polite" hidden></div>
+  <script type="module" src="src/js/pages/course-detail.js?v=20260812-course-workspace"></script>
+</body>
+</html>

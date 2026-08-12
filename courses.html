@@ -1,1 +1,131 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Courses — EduPulse AI</title><link rel="icon" type="image/png" href="src/assets/brand/edupulse-icon-v2.png"><link rel="stylesheet" href="src/css/courses.css?v=20260812-nav"></head><body><main class="dashboard shell"><header class="dash-header"><a class="brand" href="dashboard.html"><img class="brand-mark" src="src/assets/brand/edupulse-icon-v2.png" alt="">EduPulse AI</a></header><section class="page-head"><div><div class="eyebrow">Course workspace</div><h1>Your courses</h1><p><span id="semester-label" class="semester-chip"></span> · <span id="course-total" class="muted"></span></p></div><button id="add-course" class="button" type="button">Add course</button></section><section id="course-list" class="course-grid" aria-live="polite"></section></main><dialog id="course-dialog" class="modal"><div class="modal-inner"><div class="modal-head"><h2 id="course-dialog-title">Add a course</h2><button id="close-course-dialog" class="icon-button" type="button" aria-label="Close">×</button></div><p id="form-message" class="message" hidden aria-live="polite"></p><form id="course-form"><input name="course_id" type="hidden"><div class="form-grid"><div class="field"><label for="course-code-input">Course code</label><input id="course-code-input" name="course_code" maxlength="30" placeholder="STAT 201" required></div><div class="field"><label for="credits">Credit hours</label><input id="credits" name="credit_hours" type="number" min="0.5" max="99" step="0.5" value="3" required></div><div class="field span-2"><label for="course-name-input">Course name</label><input id="course-name-input" name="course_name" maxlength="160" placeholder="Applied Statistics" required></div><div class="field span-2"><label for="target">Target percentage</label><input id="target" name="target_percentage" type="number" min="0" max="100" step="0.01" placeholder="75"></div></div><div class="modal-actions"><button class="button" type="submit">Save course</button></div></form></div></dialog><script type="module" src="src/js/pages/courses.js?v=20260812-nav"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#184f3b">
+  <title>Courses — EduPulse AI</title>
+  <link rel="icon" type="image/png" href="src/assets/brand/edupulse-icon-v2.png">
+  <link rel="stylesheet" href="src/css/courses.css?v=20260812-course-workspace">
+</head>
+<body class="course-library-page">
+  <a class="app-skip-link" href="#main-content">Skip to course portfolio</a>
+  <main id="main-content" class="dashboard shell" tabindex="-1" aria-busy="true">
+    <header class="dash-header">
+      <a class="brand" href="dashboard.html"><img class="brand-mark" src="src/assets/brand/edupulse-icon-v2.png" alt="">EduPulse AI</a>
+    </header>
+
+    <section class="course-library-intro" aria-labelledby="courses-title">
+      <div>
+        <p class="eyebrow">Academic portfolio</p>
+        <h1 id="courses-title">Every course.<br><em>One clear picture.</em></h1>
+        <p class="course-intro-copy">See what is moving, what needs attention, and where your next result can make the biggest difference.</p>
+      </div>
+      <div class="course-intro-actions">
+        <a class="course-semester-control" href="semesters.html" aria-label="Manage current semester">
+          <span aria-hidden="true">◷</span>
+          <span id="semester-label">Loading semester…</span>
+          <span aria-hidden="true">›</span>
+        </a>
+        <button id="add-course" class="button course-add-button" type="button"><span aria-hidden="true">＋</span>Add course</button>
+      </div>
+    </section>
+
+    <section id="portfolio-overview" class="course-portfolio-overview" aria-label="Course portfolio summary">
+      <article class="portfolio-command-card">
+        <header class="portfolio-command-head">
+          <div><span>Course portfolio</span><small id="course-total">Loading courses…</small></div>
+          <span class="portfolio-live-pill"><i aria-hidden="true"></i>Current semester</span>
+        </header>
+        <div class="portfolio-command-body">
+          <div class="portfolio-average-block">
+            <span>Average on graded work</span>
+            <strong id="portfolio-average">—</strong>
+            <p id="portfolio-average-context">Your graded course evidence will appear here.</p>
+          </div>
+          <div class="portfolio-stats" role="list">
+            <div role="listitem"><span>Results recorded</span><strong id="portfolio-results">—</strong><small id="portfolio-results-context">Across all courses</small></div>
+            <div role="listitem"><span>Average attendance</span><strong id="portfolio-attendance">—</strong><small id="portfolio-attendance-context">No sessions recorded</small></div>
+            <div role="listitem"><span>At or above target</span><strong id="portfolio-targets">—</strong><small id="portfolio-targets-context">Among scored courses</small></div>
+          </div>
+        </div>
+      </article>
+
+      <aside class="portfolio-focus-card">
+        <div class="portfolio-focus-head"><span>Priority course</span><b aria-hidden="true">01</b></div>
+        <div id="focus-monogram" class="portfolio-focus-mark" aria-hidden="true">↗</div>
+        <p id="focus-kicker" class="portfolio-focus-kicker">Building your priority</p>
+        <h2 id="focus-title">Finding the clearest next move…</h2>
+        <p id="focus-copy">We’ll use your targets and recorded results to surface the course that deserves attention first.</p>
+        <a id="focus-link" class="portfolio-focus-action" href="courses.html">Open course <span aria-hidden="true">→</span></a>
+      </aside>
+    </section>
+
+    <section id="course-workspace" class="course-library-workspace" aria-labelledby="all-courses-title">
+      <div class="course-workspace-heading">
+        <div>
+          <p class="eyebrow">Your workspace</p>
+          <h2 id="all-courses-title">All courses</h2>
+        </div>
+        <p id="course-result-count" aria-live="polite">Loading your portfolio…</p>
+      </div>
+
+      <div id="course-toolbar" class="course-toolbar" hidden>
+        <label class="course-search" for="course-search">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
+          <span class="sr-only">Search courses</span>
+          <input id="course-search" type="search" placeholder="Search code or course name" autocomplete="off">
+        </label>
+        <div class="course-filter-group" role="group" aria-label="Filter courses">
+          <button class="active" type="button" data-course-filter="all" aria-pressed="true">All</button>
+          <button type="button" data-course-filter="attention" aria-pressed="false">Needs attention</button>
+          <button type="button" data-course-filter="on-track" aria-pressed="false">On track</button>
+          <button type="button" data-course-filter="awaiting" aria-pressed="false">Awaiting results</button>
+        </div>
+        <label class="course-sort" for="course-sort"><span>Sort</span><select id="course-sort"><option value="priority">Priority</option><option value="code">Course code</option><option value="performance">Performance</option><option value="attendance">Attendance</option></select></label>
+      </div>
+
+      <section id="course-list" class="course-grid course-grid-loading" aria-live="polite" aria-label="Courses">
+        <article class="course-card-skeleton" aria-hidden="true"></article>
+        <article class="course-card-skeleton" aria-hidden="true"></article>
+        <article class="course-card-skeleton" aria-hidden="true"></article>
+      </section>
+    </section>
+  </main>
+
+  <dialog id="course-dialog" class="modal course-form-dialog" aria-labelledby="course-dialog-title" aria-describedby="course-dialog-copy">
+    <div class="modal-inner">
+      <div class="modal-head">
+        <div><p class="modal-kicker">Course details</p><h2 id="course-dialog-title">Add a course</h2></div>
+        <button id="close-course-dialog" class="icon-button" type="button" aria-label="Close course form">×</button>
+      </div>
+      <p id="course-dialog-copy" class="modal-copy">Set a target so EduPulse can show whether your graded work is moving in the right direction.</p>
+      <p id="form-message" class="message" hidden aria-live="polite"></p>
+      <form id="course-form">
+        <input name="course_id" type="hidden">
+        <div class="form-grid">
+          <div class="field"><label for="course-code-input">Course code</label><input id="course-code-input" name="course_code" maxlength="30" placeholder="STAT 201" autocomplete="off" required></div>
+          <div class="field"><label for="credits">Credit hours</label><input id="credits" name="credit_hours" type="number" min="0.5" max="99" step="0.5" value="3" inputmode="decimal" required></div>
+          <div class="field span-2"><label for="course-name-input">Course name</label><input id="course-name-input" name="course_name" maxlength="160" placeholder="Applied Statistics" autocomplete="off" required></div>
+          <div class="field span-2"><label for="target">Target percentage <span class="field-optional">Optional</span></label><input id="target" name="target_percentage" type="number" min="0" max="100" step="0.01" placeholder="75" inputmode="decimal"><small>Used only to compare your recorded results with your own goal.</small></div>
+        </div>
+        <div class="modal-actions"><button id="cancel-course-form" class="button secondary" type="button">Cancel</button><button class="button" type="submit">Save course</button></div>
+      </form>
+    </div>
+  </dialog>
+
+  <dialog id="delete-course-dialog" class="modal destructive-dialog" aria-labelledby="delete-course-title" aria-describedby="delete-course-copy">
+    <div class="modal-inner">
+      <div class="destructive-mark" aria-hidden="true">!</div>
+      <p class="modal-kicker">Permanent action</p>
+      <h2 id="delete-course-title">Delete this course?</h2>
+      <p id="delete-course-copy" class="modal-copy">This will also remove its assessments and attendance records. This cannot be undone.</p>
+      <p id="delete-course-message" class="message error" hidden aria-live="polite"></p>
+      <div class="modal-actions"><button id="cancel-course-delete" class="button secondary" type="button">Keep course</button><button id="confirm-course-delete" class="button danger-button" type="button">Delete course</button></div>
+    </div>
+  </dialog>
+
+  <div id="course-toast" class="course-toast" role="status" aria-live="polite" hidden></div>
+  <script type="module" src="src/js/pages/courses.js?v=20260812-course-workspace"></script>
+</body>
+</html>
