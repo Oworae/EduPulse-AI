@@ -1,0 +1,60 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  database:
+    name: Migrations, lint, and RLS tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: Start local PostgreSQL
+        run: supabase db start
+      - name: Rebuild from migrations
+        run: supabase db reset --local
+      - name: Lint database
+        run: supabase db lint --local --level error --fail-on error
+      - name: Run deterministic analytics checks
+        env:
+          LOCAL_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
+        run: psql "$LOCAL_DATABASE_URL" -v ON_ERROR_STOP=1 -f tests/database/integrity.test.sql
+      - name: Run view checks
+        env:
+          LOCAL_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
+        run: psql "$LOCAL_DATABASE_URL" -v ON_ERROR_STOP=1 -f tests/database/analytics.test.sql
+      - name: Run two-user RLS isolation tests
+        env:
+          LOCAL_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
+        run: psql "$LOCAL_DATABASE_URL" -v ON_ERROR_STOP=1 -f tests/database/rls.test.sql
+      - name: Stop local services
+        if: always()
+        run: supabase stop --no-backup
+
+  edge-functions:
+    name: Edge Function checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - run: deno fmt --check supabase/functions
+      - run: deno check supabase/functions/recompute-pulse/index.ts supabase/functions/generate-insight/index.ts supabase/functions/academic-coach/index.ts
+      - name: Reject committed backend secrets
+        run: |
+          if git grep -nE '(sb_secret_[A-Za-z0-9_-]+|postgresql://[^[:space:]]+:[^[:space:]@]+@)' -- ':!*.example'; then
+            echo 'A backend credential appears to be committed.' >&2
+            exit 1
+          fi

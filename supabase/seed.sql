@@ -1,0 +1,2 @@
+-- Intentionally empty. No institutional grading scale is seeded without verified boundaries.
+-- Add deterministic development fixtures in tests, not production seed data.
