@@ -10,3 +10,13 @@ export function el(tag, options = {}, children = []) {
   return node;
 }
 export function formatPercent(value) { return value == null ? "No results yet" : `${Number(value).toFixed(1)}%`; }
+
+export function formattedText(text) {
+  const paragraph = el("p");
+  const parts = String(text).split(/(\*\*[^*]+\*\*)/g);
+  for (const part of parts) {
+    if (part.startsWith("**") && part.endsWith("**") && part.length > 4) paragraph.append(el("strong", { text: part.slice(2, -2) }));
+    else paragraph.append(document.createTextNode(part));
+  }
+  return paragraph;
+}
