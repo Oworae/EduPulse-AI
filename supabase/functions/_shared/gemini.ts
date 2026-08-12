@@ -21,7 +21,19 @@ export async function callGemini(
     },
   );
   if (!response.ok) {
-    throw new Error(`Gemini request failed (${response.status})`);
+    let detail = "";
+    try {
+      const failure = await response.json();
+      if (typeof failure?.error?.message === "string") {
+        detail = failure.error.message;
+      }
+    } catch { /* retain the controlled fallback */ }
+    const safeDetail = detail.replaceAll(key, "[redacted]").slice(0, 300);
+    throw new Error(
+      `Gemini request failed (${response.status})${
+        safeDetail ? `: ${safeDetail}` : ""
+      }`,
+    );
   }
   const data = await response.json();
   const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
