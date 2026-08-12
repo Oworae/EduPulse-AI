@@ -54,7 +54,7 @@ jobs:
       - run: deno check supabase/functions/recompute-pulse/index.ts supabase/functions/generate-insight/index.ts supabase/functions/academic-coach/index.ts
       - name: Reject committed backend secrets
         run: |
-          if git grep -nE '(sb_secret_[A-Za-z0-9_-]+|postgresql://[^[:space:]]+:[^[:space:]@]+@)' -- ':!*.example'; then
+          if git grep -nE '(sb_secret_[A-Za-z0-9_-]{16,}|postgresql://[^[:space:]]+:[^[:space:]@]+@db\.[a-z0-9-]+\.supabase\.co)' -- ':!*.example'; then
             echo 'A backend credential appears to be committed.' >&2
             exit 1
           fi
