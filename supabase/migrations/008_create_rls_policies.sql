@@ -13,6 +13,21 @@ alter table public.study_actions enable row level security;
 alter table public.chat_conversations enable row level security;
 alter table public.chat_messages enable row level security;
 
+-- PostgreSQL privileges and RLS are both required. Privileges define which
+-- operations the API role may attempt; the policies below restrict those
+-- operations to rows owned by the authenticated student.
+grant usage on schema public to authenticated;
+grant select, update on public.profiles to authenticated;
+grant select, insert, update, delete on public.grading_scales, public.grading_bands to authenticated;
+grant select, insert, update, delete on public.semesters, public.courses, public.assessments,
+  public.attendance_entries, public.weekly_checkins, public.chat_conversations to authenticated;
+grant select on public.academic_snapshots, public.academic_signals, public.ai_insights,
+  public.study_actions, public.chat_messages to authenticated;
+grant select on public.v_course_performance, public.v_course_attendance,
+  public.v_semester_course_summary, public.v_semester_performance,
+  public.v_dashboard_summary to authenticated;
+grant update (status, completed_at) on public.study_actions to authenticated;
+
 create policy profiles_select_own on public.profiles for select to authenticated using ((select auth.uid()) = id);
 create policy profiles_update_own on public.profiles for update to authenticated using ((select auth.uid()) = id) with check ((select auth.uid()) = id);
 
@@ -38,8 +53,3 @@ create policy actions_select_own on public.study_actions for select to authentic
 create policy actions_update_own on public.study_actions for update to authenticated using ((select auth.uid()) = user_id) with check ((select auth.uid()) = user_id);
 create policy conversations_own on public.chat_conversations for all to authenticated using ((select auth.uid()) = user_id) with check ((select auth.uid()) = user_id);
 create policy messages_select_own on public.chat_messages for select to authenticated using ((select auth.uid()) = user_id);
-
-revoke insert, update, delete on public.academic_snapshots, public.academic_signals, public.ai_insights, public.chat_messages from authenticated;
-revoke insert, delete on public.study_actions from authenticated;
-revoke update on public.study_actions from authenticated;
-grant update (status, completed_at) on public.study_actions to authenticated;

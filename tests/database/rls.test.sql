@@ -15,6 +15,12 @@ insert into public.semesters (id,user_id,grading_scale_id,academic_year,semester
 set local role authenticated;
 select set_config('request.jwt.claim.sub','10000000-0000-4000-8000-000000000001',true);
 do $$ declare n integer; begin
+  if not has_table_privilege('authenticated', 'public.semesters', 'SELECT') then raise exception 'authenticated lacks semester SELECT privilege'; end if;
+  if not has_table_privilege('authenticated', 'public.courses', 'INSERT') then raise exception 'authenticated lacks course INSERT privilege'; end if;
+  if has_table_privilege('authenticated', 'public.academic_snapshots', 'INSERT') then raise exception 'authenticated can forge snapshots'; end if;
+  if has_table_privilege('authenticated', 'public.ai_insights', 'INSERT') then raise exception 'authenticated can forge AI insights'; end if;
+  if has_column_privilege('authenticated', 'public.study_actions', 'title', 'UPDATE') then raise exception 'authenticated can rewrite action content'; end if;
+  if not has_column_privilege('authenticated', 'public.study_actions', 'status', 'UPDATE') then raise exception 'authenticated cannot update action status'; end if;
   select count(*) into n from public.semesters;
   if n <> 1 then raise exception 'RLS isolation failed: User A saw % semesters', n; end if;
   if exists (select 1 from public.profiles where id = '20000000-0000-4000-8000-000000000002') then raise exception 'profile RLS leaked User B'; end if;
