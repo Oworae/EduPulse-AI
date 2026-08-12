@@ -14,6 +14,7 @@ export function setupAppNavigation() {
   const header = document.querySelector(".dash-header");
   const logout = document.querySelector("[data-logout]");
   if (!header || !logout || document.querySelector(".mobile-tab-bar")) return;
+  const desktopNav = logout.closest("nav");
 
   const account = document.createElement("div");
   account.className = "account-control";
@@ -31,6 +32,7 @@ export function setupAppNavigation() {
   logout.className = "account-signout";
   logout.textContent = "Sign out";
   menu.append(logout);
+  desktopNav?.style.removeProperty("display");
   account.append(trigger, menu);
   header.append(account);
 
