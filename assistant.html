@@ -1,1 +1,56 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Academic coach — EduPulse AI</title><link rel="icon" type="image/png" href="src/assets/brand/edupulse-icon-v2.png"><link rel="stylesheet" href="src/css/insights.css?v=20260812-nav"></head><body><main class="dashboard shell"><header class="dash-header"><a class="brand" href="dashboard.html"><img class="brand-mark" src="src/assets/brand/edupulse-icon-v2.png" alt="">EduPulse AI</a></header><section class="chat-shell"><header class="chat-head"><div class="eyebrow">AI academic coach</div><h1 id="conversation-title">Academic coaching</h1><p class="muted">Grounded in your own academic data. Not an official university adviser.</p></header><div id="messages" class="messages" aria-live="polite"></div><div><p id="form-message" class="message coach-message" hidden></p><form id="coach-form" class="coach-form"><label class="sr-only" for="coach-message">Ask the academic coach</label><textarea id="coach-message" name="message" rows="2" maxlength="4000" placeholder="What should I focus on this week?" required></textarea><button class="button" type="submit">Send</button></form></div></section></main><script type="module" src="src/js/pages/assistant.js?v=20260812-nav"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Academic coach — EduPulse AI</title>
+  <link rel="icon" type="image/png" href="src/assets/brand/edupulse-icon-v2.png">
+  <link rel="stylesheet" href="src/css/insights.css?v=20260812-coach">
+</head>
+<body class="coach-page">
+  <main class="dashboard shell">
+    <header class="dash-header">
+      <a class="brand" href="dashboard.html"><img class="brand-mark" src="src/assets/brand/edupulse-icon-v2.png" alt="">EduPulse AI</a>
+    </header>
+
+    <section class="chat-shell" aria-label="Academic coach conversation">
+      <header class="coach-header">
+        <div class="coach-identity">
+          <div class="coach-avatar" aria-hidden="true">✦</div>
+          <div>
+            <div class="coach-name-row"><h1 id="conversation-title">Academic coach</h1><span class="coach-status">Online</span></div>
+            <p>Personal guidance grounded in your academic records</p>
+          </div>
+        </div>
+        <div class="coach-data-note" title="Your grades are calculated separately from AI responses">
+          <span aria-hidden="true">◆</span> Uses your EduPulse data
+        </div>
+      </header>
+
+      <div id="messages" class="messages" aria-live="polite" aria-label="Conversation messages"></div>
+
+      <section id="coach-starters" class="coach-starters" aria-label="Suggested questions" hidden>
+        <p>Try asking</p>
+        <div class="starter-list">
+          <button type="button" data-prompt="What should I focus on this week?">This week’s focus</button>
+          <button type="button" data-prompt="Which course needs my attention most right now?">Course to prioritize</button>
+          <button type="button" data-prompt="How is my attendance affecting my progress?">Attendance impact</button>
+        </div>
+      </section>
+
+      <footer class="composer-area">
+        <p id="form-message" class="message coach-message" hidden aria-live="polite"></p>
+        <form id="coach-form" class="coach-form">
+          <label class="sr-only" for="coach-message">Message your academic coach</label>
+          <textarea id="coach-message" name="message" rows="1" maxlength="4000" placeholder="Ask about your courses, attendance, or next step…" required></textarea>
+          <button class="coach-send" type="submit" aria-label="Send message">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 14-8-4 16-3-6Zm0 0 7 2"/></svg>
+          </button>
+        </form>
+        <p class="composer-hint">EduPulse can explain your records, but it does not replace an academic adviser.</p>
+      </footer>
+    </section>
+  </main>
+  <script type="module" src="src/js/pages/assistant.js?v=20260812-coach"></script>
+</body>
+</html>
