@@ -1,4 +1,5 @@
 import { supabase } from "../config/supabase.js";
+import { invokeFunction } from "./function.service.js";
 
 export async function listConversations() {
   const { data, error } = await supabase.from("chat_conversations").select("*").order("updated_at", { ascending: false });
@@ -14,6 +15,5 @@ export async function listMessages(conversationId) {
   if (error) throw error; return data;
 }
 export async function sendCoachMessage(conversationId, message) {
-  const { data, error } = await supabase.functions.invoke("academic-coach", { body: { conversation_id: conversationId, message } });
-  if (error) throw error; return data.message;
+  const data = await invokeFunction("academic-coach", { conversation_id: conversationId, message }); return data.message;
 }

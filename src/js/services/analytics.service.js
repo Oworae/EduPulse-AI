@@ -1,9 +1,7 @@
-import { supabase } from "../config/supabase.js";
+import { invokeFunction } from "./function.service.js";
 
 export async function recomputePulse(semesterId) {
-  const { data, error } = await supabase.functions.invoke("recompute-pulse", { body: { semester_id: semesterId } });
-  if (error) throw error;
-  return data;
+  return invokeFunction("recompute-pulse", { semester_id: semesterId });
 }
 
 export async function recomputePulseQuietly(semesterId) {

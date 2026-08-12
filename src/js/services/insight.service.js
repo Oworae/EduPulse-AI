@@ -1,9 +1,9 @@
 import { supabase } from "../config/supabase.js";
+import { invokeFunction } from "./function.service.js";
 
 export async function generateInsight(type = "home_summary", courseId = null) {
   const body = { type }; if (courseId) body.course_id = courseId;
-  const { data, error } = await supabase.functions.invoke("generate-insight", { body });
-  if (error) throw error; return data;
+  return invokeFunction("generate-insight", body);
 }
 export async function listInsights(semesterId) {
   const { data, error } = await supabase.from("ai_insights").select("*").eq("semester_id", semesterId).order("generated_at", { ascending: false }).limit(12);
