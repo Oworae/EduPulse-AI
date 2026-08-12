@@ -1,0 +1,9 @@
+import { requireSession } from "../auth/guards.js";
+import { bindLogout } from "../auth/logout.js";
+import { generateInsight, insightContent } from "../services/insight.service.js";
+import { getCurrentSemester, listSnapshots } from "../services/semester.service.js";
+import { el } from "../utils/dom.js";
+import { setBusy, showMessage } from "../utils/forms.js";
+await requireSession({ requireOnboarding: true }); bindLogout(); const semester = await getCurrentSemester(); document.querySelector("#semester-title").textContent = `${semester.academic_year} · ${semester.semester_name}`;
+const snapshots = await listSnapshots(semester.id); const chart = document.querySelector("#trend-chart"); if (!snapshots.length) chart.append(el("p", { className: "muted", text: "Pulse history will appear after academic data is recorded." })); else { const min = Math.min(...snapshots.map((x) => Number(x.pulse_score))); const max = Math.max(...snapshots.map((x) => Number(x.pulse_score))); for (const item of snapshots) { const height = max === min ? 65 : 25 + (Number(item.pulse_score)-min)/(max-min)*70; chart.append(el("div", { className: "trend-column", title: `${item.snapshot_date}: ${item.pulse_score}` }, [el("span", { style: `height:${height}%` }), el("small", { text: item.snapshot_date.slice(5) })])); } }
+const button = document.querySelector("#generate-review"); button.addEventListener("click", async () => { setBusy(button, true, "Generating…"); try { const result = await generateInsight("semester_review"); const content = insightContent(result.insight); document.querySelector("#review-content").replaceChildren(el("h2", { text: content.title }), el("p", { text: content.summary }), el("p", { className: "muted", text: result.cached ? "Reused because your context has not changed." : "New review generated." })); } catch (error) { showMessage(error.message, "error"); } finally { setBusy(button, false); } });
