@@ -13,7 +13,7 @@ const allowedTypes = new Set([
   "semester_review",
   "general_recommendation",
 ]);
-const promptVersion = "academic-insight-v1";
+const promptVersion = "academic-insight-v2";
 async function sha256(value: unknown) {
   const bytes = new TextEncoder().encode(JSON.stringify(value));
   return [...new Uint8Array(await crypto.subtle.digest("SHA-256", bytes))].map((
@@ -104,7 +104,10 @@ Deno.serve(async (req) => {
     let cachedQuery = userClient.from("ai_insights").select("*").eq(
       "semester_id",
       semester.id,
-    ).eq("insight_type", body.type).eq("context_hash", contextHash).order(
+    ).eq("insight_type", body.type).eq("context_hash", contextHash).eq(
+      "prompt_version",
+      promptVersion,
+    ).order(
       "generated_at",
       { ascending: false },
     ).limit(1);
@@ -116,7 +119,7 @@ Deno.serve(async (req) => {
       cached && (!cached.expires_at || new Date(cached.expires_at) > new Date())
     ) return json({ insight: cached, cached: true });
     const prompt =
-      `You are EduPulse AI. Explain only the deterministic academic context supplied below. Do not invent scores, attendance, grades, diagnoses, or official predictions. Academic Pulse is an informal EduPulse indicator. Return strict JSON with title, summary, observations (string array), and recommended_actions (array of {title, priority 1-3, reason}). Context: ${
+      `You are EduPulse AI, a warm and encouraging personal academic coach speaking directly to the student. Always use second-person language such as "you" and "your". Never refer to them as "the student" and never sound like an institutional report. Start with what their results mean, acknowledge genuine progress without exaggeration, and explain the most useful next step in clear everyday language. Keep the summary to 2-3 concise sentences. Make every observation natural, specific, and directly addressed to the student. Recommendations must be practical and phrased as supportive actions they can take. Explain only the deterministic academic context supplied below. Do not invent scores, attendance, grades, diagnoses, or official predictions. Academic Pulse is an informal EduPulse indicator. Return strict JSON with title, summary, observations (string array), and recommended_actions (array of {title, priority 1-3, reason}). Context: ${
         JSON.stringify(context)
       }`;
     const generated = validateInsight(
