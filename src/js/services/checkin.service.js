@@ -2,7 +2,9 @@ import { supabase } from "../config/supabase.js";
 
 export function currentWeekStart() {
   const date = new Date(); const day = date.getDay(); const offset = day === 0 ? -6 : 1 - day;
-  date.setDate(date.getDate() + offset); return date.toISOString().slice(0, 10);
+  date.setDate(date.getDate() + offset);
+  const year = date.getFullYear(); const month = String(date.getMonth() + 1).padStart(2, "0"); const dayOfMonth = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${dayOfMonth}`;
 }
 export async function getCheckin(semesterId, weekStart) {
   const { data, error } = await supabase.from("weekly_checkins").select("*").eq("semester_id", semesterId).eq("week_start", weekStart).maybeSingle();

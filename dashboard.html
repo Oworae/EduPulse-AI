@@ -1,1 +1,125 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Dashboard — EduPulse AI</title><link rel="icon" type="image/png" href="src/assets/brand/edupulse-icon-v2.png"><link rel="stylesheet" href="src/css/dashboard.css?v=20260812-nav"></head><body><main class="dashboard shell"><header class="dash-header"><a class="brand" href="dashboard.html"><img class="brand-mark" src="src/assets/brand/edupulse-icon-v2.png" alt="">EduPulse AI</a></header><section class="hero"><div class="eyebrow">Academic overview</div><h1>Hello, <span id="student-name">Student</span>.</h1><span id="semester-label" class="semester-chip">Current semester</span></section><section class="metrics" aria-label="Semester metrics"><article class="metric card"><span>Academic Pulse</span><strong id="pulse">—</strong></article><article class="metric card"><span>Current average</span><strong id="average">—</strong></article><article class="metric card"><span>Attendance</span><strong id="attendance">—</strong></article><article class="metric card"><span>Courses</span><strong id="course-count">0</strong></article></section><section class="empty-state card"><div><h2>Understand how your semester is changing.</h2><p>Keep your records current, review historical trends, or ask the academic coach what to prioritize.</p></div><div class="dashboard-actions"><a class="button secondary" href="checkin.html">Weekly check-in</a><a class="button secondary" href="semester-review.html">Semester review</a><a class="button" href="assistant.html">Ask the coach</a></div></section></main><script type="module" src="src/js/pages/dashboard.js?v=20260812-nav"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f5f2e9">
+  <title>Dashboard — EduPulse AI</title>
+  <link rel="icon" type="image/png" href="src/assets/brand/edupulse-icon-v2.png">
+  <link rel="stylesheet" href="src/css/dashboard.css?v=20260812-command">
+</head>
+<body class="dashboard-home">
+  <a class="app-skip-link" href="#dashboard-content">Skip to dashboard</a>
+  <main id="dashboard-main" class="dashboard shell" data-dashboard aria-busy="true">
+    <header class="dash-header">
+      <a class="brand" href="dashboard.html"><img class="brand-mark" src="src/assets/brand/edupulse-icon-v2.png" alt="">EduPulse AI</a>
+    </header>
+
+    <div id="dashboard-content">
+      <section class="dashboard-welcome">
+        <div>
+          <p id="today-label" class="today-label">Your academic command center</p>
+          <h1><span id="greeting">Welcome back</span>, <span id="student-name">Student</span>.</h1>
+          <p id="welcome-summary">Bringing your academic picture into focus…</p>
+        </div>
+        <a id="semester-label" class="semester-control" href="semesters.html"><span>Current semester</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></a>
+      </section>
+
+      <div id="dashboard-error" class="dashboard-alert" role="alert" hidden>
+        <div><strong>We couldn’t load your complete dashboard.</strong><span id="dashboard-error-text">Check your connection and try again.</span></div>
+        <button id="retry-dashboard" type="button">Try again</button>
+      </div>
+
+      <section class="dashboard-spotlight" aria-label="Academic overview">
+        <article class="pulse-command">
+          <header class="command-card-head">
+            <div><span class="command-label">Academic Pulse</span><small id="pulse-date">Latest academic snapshot</small></div>
+            <span id="pulse-status" class="pulse-status neutral">Building picture</span>
+          </header>
+          <div class="pulse-command-body">
+            <div id="pulse-ring" class="pulse-ring-dashboard" style="--pulse-value:0">
+              <div><strong id="pulse">—</strong><span>out of 100</span></div>
+            </div>
+            <div class="pulse-narrative">
+              <h2 id="pulse-headline">Your academic picture is taking shape.</h2>
+              <p id="pulse-description">Add course results, attendance, and a weekly check-in to build a more useful pulse.</p>
+              <div class="pulse-factors">
+                <div><span>Performance</span><strong id="pulse-performance">—</strong></div>
+                <div><span>Attendance</span><strong id="pulse-attendance">—</strong></div>
+              </div>
+            </div>
+          </div>
+          <footer class="pulse-trend">
+            <div><span>Momentum</span><strong id="trend-label">Waiting for history</strong></div>
+            <div id="pulse-chart" class="pulse-chart" aria-label="Academic Pulse history"></div>
+            <a href="semester-review.html">Full review <span aria-hidden="true">→</span></a>
+          </footer>
+        </article>
+
+        <aside class="next-move-card">
+          <div class="next-move-top"><span>Your next move</span><b id="focus-number">01</b></div>
+          <div id="focus-icon" class="next-move-icon" aria-hidden="true">↗</div>
+          <p id="focus-kicker" class="next-move-kicker">Setting your priority</p>
+          <h2 id="focus-title">Finding the most useful next step…</h2>
+          <p id="focus-copy">EduPulse is reviewing your current semester signals.</p>
+          <a id="focus-link" class="next-move-action" href="courses.html">Open workspace <span aria-hidden="true">→</span></a>
+          <div class="quick-launch" aria-label="Quick actions">
+            <a href="courses.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h11a3 3 0 0 1 3 3v13H7a2 2 0 0 1-2-2Zm0 0v14m2-2h12"/></svg><span>Courses</span></a>
+            <a href="checkin.html"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4m8-4v4M3 10h18m-13 5 2.5 2.5L16 12"/></svg><span>Check-in</span></a>
+            <a href="assistant.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a7 7 0 0 0-7 7v3a4 4 0 0 0 4 4h1m2-14a7 7 0 0 1 7 7v3a4 4 0 0 1-4 4h-1m-4 3h4"/></svg><span>Coach</span></a>
+          </div>
+        </aside>
+      </section>
+
+      <section class="dashboard-metrics" aria-label="Current semester metrics">
+        <article class="dashboard-metric">
+          <div class="metric-top"><span>Current average</span><i aria-hidden="true">%</i></div>
+          <strong id="average">—</strong>
+          <p id="average-context">Across completed assessments</p>
+        </article>
+        <article class="dashboard-metric">
+          <div class="metric-top"><span>Provisional GPA</span><i aria-hidden="true">G</i></div>
+          <strong id="gpa">—</strong>
+          <p>Based on results recorded so far</p>
+        </article>
+        <article class="dashboard-metric">
+          <div class="metric-top"><span>Attendance</span><i aria-hidden="true">✓</i></div>
+          <strong id="attendance">—</strong>
+          <p id="attendance-context">Across tracked sessions</p>
+        </article>
+        <article class="dashboard-metric assessment-metric">
+          <div class="metric-top"><span>Coursework</span><i aria-hidden="true">↗</i></div>
+          <strong id="assessment-progress">—</strong>
+          <p id="assessment-context">No assessments recorded</p>
+          <div class="metric-progress" aria-hidden="true"><span id="assessment-bar"></span></div>
+        </article>
+      </section>
+
+      <section class="dashboard-detail-grid">
+        <article class="courses-overview card">
+          <header class="panel-heading">
+            <div><span>Course performance</span><h2>Where you stand</h2></div>
+            <a href="courses.html">View all <span aria-hidden="true">→</span></a>
+          </header>
+          <div id="course-overview" class="course-overview-list" aria-live="polite">
+            <div class="panel-loading"><i></i><i></i><i></i></div>
+          </div>
+        </article>
+
+        <aside class="dashboard-side-stack">
+          <article class="week-card card">
+            <header class="panel-heading compact"><div><span>This week</span><h2>Your rhythm</h2></div><a href="checkin.html">Open <span aria-hidden="true">→</span></a></header>
+            <div id="week-content" class="week-content" aria-live="polite"><div class="panel-loading"><i></i><i></i></div></div>
+          </article>
+          <article class="signals-card">
+            <div class="signal-orb" aria-hidden="true">✦</div>
+            <div><span>Academic signals</span><strong id="signal-count">—</strong><p id="signal-copy">Reviewing your current academic context…</p></div>
+            <a href="insights.html" aria-label="Open academic insights">→</a>
+          </article>
+        </aside>
+      </section>
+    </div>
+  </main>
+  <script type="module" src="src/js/pages/dashboard.js?v=20260812-command"></script>
+</body>
+</html>
