@@ -1,1 +1,65 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Create account — EduPulse AI</title><link rel="icon" type="image/png" href="src/assets/brand/edupulse-icon-v2.png"><link rel="stylesheet" href="src/css/auth.css"></head><body><main class="auth-layout"><section class="auth-story"><a class="brand" href="index.html"><img class="brand-mark" src="src/assets/brand/edupulse-icon-v2.png" alt="">EduPulse AI</a><div><span class="story-pill">Record → Understand → Improve</span><h1>Your progress belongs to you.</h1><p>Build a private academic record that grows more useful every week—independent of any university portal.</p></div></section><section class="auth-panel"><div class="auth-card"><div class="eyebrow">Create your account</div><h2>Start your journey</h2><p class="muted">Use any personal email address. No invitation or institutional account required.</p><p id="form-message" class="message" hidden aria-live="polite"></p><form id="signup-form"><div class="field"><label for="full-name">Full name</label><input id="full-name" name="full_name" autocomplete="name" required></div><div class="field"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" required></div><div class="field"><label for="password">Password</label><input id="password" name="password" type="password" minlength="8" autocomplete="new-password" required></div><div class="field"><label for="confirm-password">Confirm password</label><input id="confirm-password" name="confirm_password" type="password" minlength="8" autocomplete="new-password" required></div><button class="button" type="submit">Create account</button></form><p class="auth-switch">Already tracking? <a href="login.html">Sign in</a></p></div></section></main><script type="module" src="src/js/auth/signup.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#184f3b">
+  <title>Create account — EduPulse AI</title>
+  <link rel="icon" type="image/png" href="src/assets/brand/edupulse-icon-v2.png">
+  <link rel="stylesheet" href="src/css/auth.css?v=20260909-auth-workspace">
+</head>
+<body class="auth-page signup-page">
+  <a class="auth-skip-link" href="#auth-form">Skip to account form</a>
+  <main class="auth-layout">
+    <section class="auth-story" aria-labelledby="story-title">
+      <a class="brand auth-brand" href="index.html"><img class="brand-mark" src="src/assets/brand/edupulse-icon-v2.png" alt="">EduPulse AI</a>
+      <div class="auth-story-content">
+        <span class="story-pill"><i aria-hidden="true"></i> Record · Understand · Improve</span>
+        <h1 id="story-title">Your progress belongs to <em>you.</em></h1>
+        <p>Build a private academic record that becomes more useful with every result, class and weekly reflection.</p>
+        <ol class="signup-steps" aria-label="How EduPulse works">
+          <li><span>01</span><div><strong>Record the evidence</strong><small>Courses, results, attendance and weekly rhythm.</small></div></li>
+          <li><span>02</span><div><strong>See where you stand</strong><small>Transparent indicators based on what you entered.</small></div></li>
+          <li><span>03</span><div><strong>Choose your next move</strong><small>Turn your current picture into a focused action.</small></div></li>
+        </ol>
+      </div>
+      <p class="auth-story-note"><span aria-hidden="true">✦</span> Independent of any university portal.</p>
+    </section>
+
+    <section class="auth-panel">
+      <div id="auth-form" class="auth-card" tabindex="-1">
+        <a class="auth-back" href="index.html"><span aria-hidden="true">←</span> Back to home</a>
+        <header class="auth-card-head"><div class="eyebrow">Create your account</div><h2>Start your journey</h2><p>Use any personal email address. No invitation or institutional account is required.</p></header>
+        <p id="form-message" class="message" hidden aria-live="polite" tabindex="-1"></p>
+        <form id="signup-form" novalidate>
+          <div class="auth-field" data-field="full_name">
+            <label for="full-name">Full name</label>
+            <div class="auth-input"><span class="field-icon" aria-hidden="true">Aa</span><input id="full-name" name="full_name" autocomplete="name" placeholder="Your full name" required aria-describedby="full-name-error"><span class="field-valid" aria-hidden="true">✓</span></div>
+            <small id="full-name-error" class="field-error" aria-live="polite"></small>
+          </div>
+          <div class="auth-field" data-field="email">
+            <label for="email">Email address</label>
+            <div class="auth-input"><span class="field-icon" aria-hidden="true">@</span><input id="email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com" required aria-describedby="email-error"><span class="field-valid" aria-hidden="true">✓</span></div>
+            <small id="email-error" class="field-error" aria-live="polite"></small>
+          </div>
+          <div class="auth-field" data-field="password">
+            <label for="password">Password</label>
+            <div class="auth-input"><span class="field-icon lock-icon" aria-hidden="true">●</span><input id="password" name="password" type="password" minlength="8" autocomplete="new-password" placeholder="Create a password" required aria-describedby="password-guidance password-error"><button class="password-toggle" type="button" aria-label="Show password" aria-pressed="false"><span aria-hidden="true">Show</span></button></div>
+            <small id="password-error" class="field-error" aria-live="polite"></small>
+            <div id="password-guidance" class="password-guidance"><div class="strength-track" aria-hidden="true"><i></i></div><div class="password-requirements"><span data-requirement="length"><i aria-hidden="true">✓</i> 8+ characters</span><span data-requirement="letter"><i aria-hidden="true">✓</i> A letter</span><span data-requirement="number"><i aria-hidden="true">✓</i> A number</span></div></div>
+          </div>
+          <div class="auth-field" data-field="confirm_password">
+            <label for="confirm-password">Confirm password</label>
+            <div class="auth-input"><span class="field-icon lock-icon" aria-hidden="true">●</span><input id="confirm-password" name="confirm_password" type="password" minlength="8" autocomplete="new-password" placeholder="Enter it again" required aria-describedby="confirm-password-error"><button class="password-toggle" type="button" aria-label="Show password" aria-pressed="false"><span aria-hidden="true">Show</span></button></div>
+            <small id="confirm-password-error" class="field-error" aria-live="polite"></small>
+          </div>
+          <button class="button auth-submit" type="submit"><span class="submit-label">Create account</span><i class="button-spinner" aria-hidden="true"></i><span aria-hidden="true" class="submit-arrow">→</span></button>
+        </form>
+        <div class="auth-trust"><span aria-hidden="true">✓</span><p><strong>Private by design.</strong> Your academic record is separated from other students through ownership controls.</p></div>
+        <p class="auth-switch">Already tracking? <a href="login.html">Sign in <span aria-hidden="true">→</span></a></p>
+      </div>
+    </section>
+  </main>
+  <script type="module" src="src/js/auth/signup.js?v=20260909-auth-workspace"></script>
+</body>
+</html>

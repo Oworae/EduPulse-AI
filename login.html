@@ -1,1 +1,57 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sign in — EduPulse AI</title><link rel="icon" type="image/png" href="src/assets/brand/edupulse-icon-v2.png"><link rel="stylesheet" href="src/css/auth.css"></head><body><main class="auth-layout"><section class="auth-story"><a class="brand" href="index.html"><img class="brand-mark" src="src/assets/brand/edupulse-icon-v2.png" alt="">EduPulse AI</a><div><span class="story-pill">Welcome back</span><h1>Return to your rhythm.</h1><p>Your grades are only the beginning. See how your performance, attendance, and habits are changing together.</p></div></section><section class="auth-panel"><div class="auth-card"><div class="eyebrow">Student sign in</div><h2>Continue tracking</h2><p class="muted">Enter the email and password you used to create your account.</p><p id="form-message" class="message" hidden aria-live="polite"></p><form id="login-form"><div class="field"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" required></div><div class="field"><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" required></div><button class="button" type="submit">Sign in</button></form><p class="auth-switch">New to EduPulse? <a href="signup.html">Create an account</a></p></div></section></main><script type="module" src="src/js/auth/login.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#184f3b">
+  <title>Sign in — EduPulse AI</title>
+  <link rel="icon" type="image/png" href="src/assets/brand/edupulse-icon-v2.png">
+  <link rel="stylesheet" href="src/css/auth.css?v=20260909-auth-workspace">
+</head>
+<body class="auth-page login-page">
+  <a class="auth-skip-link" href="#auth-form">Skip to sign in</a>
+  <main class="auth-layout">
+    <section class="auth-story" aria-labelledby="story-title">
+      <a class="brand auth-brand" href="index.html"><img class="brand-mark" src="src/assets/brand/edupulse-icon-v2.png" alt="">EduPulse AI</a>
+      <div class="auth-story-content">
+        <span class="story-pill"><i aria-hidden="true"></i> Your private academic workspace</span>
+        <h1 id="story-title">Return to your <em>rhythm.</em></h1>
+        <p>Your grades are only the beginning. See how performance, attendance and study habits are changing together.</p>
+        <div class="auth-preview" aria-hidden="true">
+          <div class="preview-top"><span>Semester pulse</span><b>Live picture</b></div>
+          <div class="preview-body">
+            <div class="preview-score"><strong>76</strong><span>On track</span></div>
+            <div class="preview-bars"><i style="--bar:84%"></i><i style="--bar:68%"></i><i style="--bar:77%"></i><i style="--bar:91%"></i><i style="--bar:74%"></i></div>
+          </div>
+          <div class="preview-foot"><span>Performance</span><strong>74.8%</strong><span>Attendance</span><strong>82%</strong></div>
+        </div>
+      </div>
+      <p class="auth-story-note"><span aria-hidden="true">✦</span> Built for student judgement, not official prediction.</p>
+    </section>
+
+    <section class="auth-panel">
+      <div id="auth-form" class="auth-card" tabindex="-1">
+        <a class="auth-back" href="index.html"><span aria-hidden="true">←</span> Back to home</a>
+        <header class="auth-card-head"><div class="eyebrow">Student sign in</div><h2>Continue tracking</h2><p>Enter the details you used to create your private workspace.</p></header>
+        <p id="form-message" class="message" hidden aria-live="polite" tabindex="-1"></p>
+        <form id="login-form" novalidate>
+          <div class="auth-field" data-field="email">
+            <label for="email">Email address</label>
+            <div class="auth-input"><span class="field-icon" aria-hidden="true">@</span><input id="email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com" required aria-describedby="email-error"><span class="field-valid" aria-hidden="true">✓</span></div>
+            <small id="email-error" class="field-error" aria-live="polite"></small>
+          </div>
+          <div class="auth-field" data-field="password">
+            <div class="field-label-row"><label for="password">Password</label><span class="field-hint">At least 8 characters</span></div>
+            <div class="auth-input"><span class="field-icon lock-icon" aria-hidden="true">●</span><input id="password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" minlength="8" required aria-describedby="password-error"><button class="password-toggle" type="button" aria-label="Show password" aria-pressed="false"><span aria-hidden="true">Show</span></button></div>
+            <small id="password-error" class="field-error" aria-live="polite"></small>
+          </div>
+          <button class="button auth-submit" type="submit"><span class="submit-label">Sign in</span><i class="button-spinner" aria-hidden="true"></i><span aria-hidden="true" class="submit-arrow">→</span></button>
+        </form>
+        <div class="auth-trust"><span aria-hidden="true">✓</span><p><strong>Your record stays yours.</strong> Access is protected by your account and database ownership controls.</p></div>
+        <p class="auth-switch">New to EduPulse? <a href="signup.html">Create an account <span aria-hidden="true">→</span></a></p>
+      </div>
+    </section>
+  </main>
+  <script type="module" src="src/js/auth/login.js?v=20260909-auth-workspace"></script>
+</body>
+</html>
