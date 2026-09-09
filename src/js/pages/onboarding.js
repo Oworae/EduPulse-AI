@@ -11,10 +11,7 @@ const year = new Date().getFullYear();
 form.elements.academic_year.value = `${year}/${year + 1}`;
 const startDate = form.elements.start_date;
 const endDate = form.elements.end_date;
-const dateHelp = document.createElement("small");
-dateHelp.id = "semester-date-help";
-dateHelp.textContent = "Use the calendar picker. The displayed format follows your device settings. End date must be on or after start date.";
-endDate.after(dateHelp);
+const dateHelp = document.querySelector("#semester-date-help");
 startDate.setAttribute("aria-describedby", dateHelp.id);
 endDate.setAttribute("aria-describedby", dateHelp.id);
 function syncDates() {
@@ -34,5 +31,5 @@ form.addEventListener("submit", async (event) => {
   data.target_average = data.target_average ? Number(data.target_average) : null;
   setBusy(submit, true, "Setting up your workspace…");
   try { await completeOnboarding(data); window.location.replace("dashboard.html"); }
-  catch (error) { setBusy(submit, false); showMessage(userMessage(error, "We couldn’t finish setting up your account. Check the details and try again."), "error"); }
+  catch (error) { setBusy(submit, false); showMessage(userMessage(error, "We couldn’t finish setting up your account. Check the details and try again."), "error"); document.querySelector("#form-message").focus(); }
 });
