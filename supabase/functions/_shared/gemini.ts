@@ -5,7 +5,10 @@ export async function callGemini(
 ): Promise<string> {
   const key = Deno.env.get("GEMINI_API_KEY");
   const model = Deno.env.get("GEMINI_MODEL") ?? "gemini-3.6-flash";
-  if (!key) throw new Error("Gemini is not configured");
+  if (!key) {
+    console.error("Gemini API key is not configured");
+    throw new Error("AI_SERVICE_UNAVAILABLE");
+  }
   const response = await fetch(
     `${endpoint}/${model}:generateContent?key=${encodeURIComponent(key)}`,
     {
@@ -29,16 +32,24 @@ export async function callGemini(
       }
     } catch { /* retain the controlled fallback */ }
     const safeDetail = detail.replaceAll(key, "[redacted]").slice(0, 300);
+    // Keep provider diagnostics in server logs. Browser clients receive only a
+    // stable code so model names, provider wording, and infrastructure details
+    // never become student-facing copy.
+    console.error("Gemini request failed", {
+      status: response.status,
+      detail: safeDetail || "No provider detail",
+    });
     throw new Error(
-      `Gemini request failed (${response.status})${
-        safeDetail ? `: ${safeDetail}` : ""
-      }`,
+      response.status === 429 || response.status === 503
+        ? "AI_SERVICE_BUSY"
+        : "AI_SERVICE_UNAVAILABLE",
     );
   }
   const data = await response.json();
   const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
   if (typeof text !== "string" || !text.trim()) {
-    throw new Error("Gemini returned no usable content");
+    console.error("Gemini returned no usable content");
+    throw new Error("AI_SERVICE_UNAVAILABLE");
   }
   return text.trim();
 }
