@@ -1,6 +1,6 @@
 import { supabase } from "../config/supabase.js";
 import { routeSignedInUser } from "./session.js";
-import { showMessage } from "../utils/forms.js";
+import { showMessage, userMessage } from "../utils/forms.js";
 
 await routeSignedInUser().catch(() => false);
 const form = document.querySelector("#login-form");
@@ -17,6 +17,6 @@ form.addEventListener("submit", async (event) => {
   const values = new FormData(form);
   setBusy(submit, true, "Signing in…");
   const { error } = await supabase.auth.signInWithPassword({ email: String(values.get("email")).trim(), password: String(values.get("password")) });
-  if (error) { setBusy(submit, false); showMessage(error.message, "error"); document.querySelector("#form-message").focus(); return; }
+  if (error) { setBusy(submit, false); showMessage(userMessage(error, "We couldn’t sign you in. Check your details and try again."), "error"); document.querySelector("#form-message").focus(); return; }
   await routeSignedInUser();
 });

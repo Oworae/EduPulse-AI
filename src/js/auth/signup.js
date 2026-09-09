@@ -1,5 +1,5 @@
 import { supabase } from "../config/supabase.js";
-import { showMessage } from "../utils/forms.js";
+import { showMessage, userMessage } from "../utils/forms.js";
 
 const form = document.querySelector("#signup-form");
 const fullName = form.elements.full_name; const email = form.elements.email; const password = form.elements.password; const confirmation = form.elements.confirm_password;
@@ -22,7 +22,7 @@ form.addEventListener("submit", async (event) => {
     options: { data: { full_name: String(values.get("full_name")).trim() }, emailRedirectTo: new URL("login.html", location.href).href },
   });
   setBusy(submit, false);
-  if (error) { showMessage(error.message, "error"); document.querySelector("#form-message").focus(); return; }
+  if (error) { showMessage(userMessage(error, "We couldn’t create your account. Check the details and try again."), "error"); document.querySelector("#form-message").focus(); return; }
   if (data.session) window.location.replace("onboarding.html");
   else { form.reset(); showMessage("Account created. Check your email to confirm your address, then sign in.", "success"); }
 });

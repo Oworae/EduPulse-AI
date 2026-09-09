@@ -4,7 +4,7 @@ import { recomputePulseQuietly } from "../services/analytics.service.js";
 import { currentWeekStart, getCheckin, listCheckins, saveCheckin } from "../services/checkin.service.js";
 import { getCurrentSemester } from "../services/semester.service.js";
 import { el } from "../utils/dom.js";
-import { setBusy, showMessage } from "../utils/forms.js";
+import { setBusy, showMessage, userMessage } from "../utils/forms.js";
 
 const session = await requireSession({ requireOnboarding: true }); bindLogout(); const semester = await getCurrentSemester();
 const form = document.querySelector("#checkin-form"); const weekStart = currentWeekStart(); form.elements.week_start.value = weekStart;
@@ -31,6 +31,6 @@ form.addEventListener("submit", async (event) => {
   for (const key of ["study_hours", "classes_attended", "classes_scheduled", "workload", "confidence", "focus"]) values[key] = Number(values[key]);
   if (values.classes_attended > values.classes_scheduled) return showMessage("Classes attended cannot exceed classes scheduled.", "error");
   setBusy(submit, true, "Saving check-in…"); try { await saveCheckin(values, semester.id, session.user.id); await recomputePulseQuietly(semester.id); document.querySelector("#checkin-state").textContent = "Saved this week"; showMessage("Weekly check-in saved and Academic Pulse refreshed.", "success"); await renderHistory(); }
-  catch (error) { showMessage(error.message, "error"); } finally { setBusy(submit, false); }
+  catch (error) { showMessage(userMessage(error, "We couldn’t save your weekly check-in. Check the details and try again."), "error"); } finally { setBusy(submit, false); }
 });
 await renderHistory();

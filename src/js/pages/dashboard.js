@@ -207,7 +207,7 @@ function renderFocus(focus) {
 
 function showError(error) {
   document.querySelector("#dashboard-error").hidden = false;
-  setText("#dashboard-error-text", error?.message || "Check your connection and try again.");
+  setText("#dashboard-error-text", "We couldn’t load your dashboard. Check your connection and try again.");
 }
 
 async function renderDashboard() {

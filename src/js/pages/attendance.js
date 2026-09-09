@@ -4,7 +4,7 @@ import { recomputePulseQuietly } from "../services/analytics.service.js";
 import { deleteAttendance, listAttendance, saveAttendance } from "../services/attendance.service.js";
 import { getCourse } from "../services/course.service.js";
 import { el } from "../utils/dom.js";
-import { setBusy, showMessage } from "../utils/forms.js";
+import { setBusy, showMessage, userMessage } from "../utils/forms.js";
 
 const session = await requireSession({ requireOnboarding: true }); bindLogout();
 const courseId = new URLSearchParams(location.search).get("id");
@@ -45,5 +45,5 @@ function setFilter(filter) { activeFilter = filter; document.querySelectorAll("[
 async function render() { entries = await listAttendance(courseId); renderSummary(); renderHistory(); document.querySelector("#main-content").setAttribute("aria-busy", "false"); }
 
 document.querySelector("#add-attendance").addEventListener("click", () => openForm()); document.querySelector("#close-attendance-dialog").addEventListener("click", () => dialog.close()); document.querySelector("#cancel-attendance-form").addEventListener("click", () => dialog.close()); document.querySelector("#attendance-filter").addEventListener("click", (event) => { const button = event.target.closest("[data-attendance-filter]"); if (button) setFilter(button.dataset.attendanceFilter); });
-form.addEventListener("submit", async (event) => { event.preventDefault(); const submit = form.querySelector("button[type=submit]"); const values = Object.fromEntries(new FormData(form)); const attendanceId = values.attendance_id; delete values.attendance_id; values.session_label = values.session_label.trim(); values.notes = values.notes.trim() || null; setBusy(submit, true, "Saving…"); try { await saveAttendance(values, courseId, session.user.id, attendanceId); await recomputePulseQuietly(course.semester_id); dialog.close(); announce(attendanceId ? "Attendance session updated" : "Attendance session recorded"); await render(); } catch (error) { showMessage(error.message.includes("attendance_entries_course_id_session_date") ? "That session has already been recorded." : error.message, "error"); } finally { setBusy(submit, false); } });
+form.addEventListener("submit", async (event) => { event.preventDefault(); const submit = form.querySelector("button[type=submit]"); const values = Object.fromEntries(new FormData(form)); const attendanceId = values.attendance_id; delete values.attendance_id; values.session_label = values.session_label.trim(); values.notes = values.notes.trim() || null; setBusy(submit, true, "Saving…"); try { await saveAttendance(values, courseId, session.user.id, attendanceId); await recomputePulseQuietly(course.semester_id); dialog.close(); announce(attendanceId ? "Attendance session updated" : "Attendance session recorded"); await render(); } catch (error) { showMessage(String(error?.message).includes("attendance_entries_course_id_session_date") ? "That session has already been recorded." : userMessage(error, "We couldn’t save this attendance session. Check the details and try again."), "error"); } finally { setBusy(submit, false); } });
 await render();

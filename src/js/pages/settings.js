@@ -251,8 +251,7 @@ scaleForm.addEventListener("submit", async (event) => {
     scaleDialog.close();
     showScaleMessage("Grading scale saved. Provisional grades now use the updated bands.", "success", "#scale-status");
   } catch (error) {
-    const message = String(error?.message ?? "");
-    showScaleMessage(message.includes("continuous") || message.includes("cover 0") ? message : "We couldn’t save this grading scale. Review the bands and try again.");
+    showScaleMessage("We couldn’t save this grading scale. Review the bands and try again.");
   } finally {
     scaleDialog.dataset.busy = "false";
     setBusy(submit, false);
