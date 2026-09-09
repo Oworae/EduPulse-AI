@@ -19,7 +19,7 @@ if (snapshots.length) {
   const changeElement = document.querySelector("#pulse-change"); changeElement.textContent = label; changeElement.classList.add(change > 0 ? "positive" : change < 0 ? "negative" : "steady");
   document.querySelector("#pulse-direction").textContent = change > 0 ? `${label} since the first snapshot` : change < 0 ? `${Math.abs(change)} points below the start` : "Steady from the first snapshot";
   chart.setAttribute("aria-label", `Academic Pulse history from ${first} to ${latest}, a change of ${label} points.`);
-  for (const item of snapshots) { const score = number(item.pulse_score) ?? 0; chart.append(el("div", { className: "trend-column", title: `${formatDate(item.snapshot_date)}: Pulse ${score}` }, [el("span", { style: `height:${Math.max(5, Math.min(100, score))}%`, "data-score": score }), el("small", { text: formatDate(item.snapshot_date) })])); }
+  for (const item of snapshots) { const score = number(item.pulse_score) ?? 0; chart.append(el("div", { className: "trend-column", title: `${formatDate(item.snapshot_date)}: Pulse ${score}` }, [el("span", { style: `height:${Math.max(5, Math.min(100, score))}%`, dataScore: score }), el("small", { text: formatDate(item.snapshot_date) })])); }
 }
 const button = document.querySelector("#generate-review");
 button.addEventListener("click", async () => { setBusy(button, true, "Generating…"); try {
