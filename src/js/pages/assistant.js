@@ -19,7 +19,7 @@ function showWelcome() {
   starters.hidden = false;
 }
 async function renderMessages() { messages.replaceChildren(); const history = await listMessages(conversationId); if (!history.length) showWelcome(); else { starters.hidden = true; for (const message of history) appendMessage(message); } }
-function resizeInput() { input.style.height = "auto"; input.style.height = `${Math.min(input.scrollHeight, 140)}px`; }
+function resizeInput() { input.style.height = "auto"; input.style.height = `${Math.min(input.scrollHeight, 140)}px`; document.querySelector("#coach-character-count").textContent = input.value.length; }
 function setSending(sending) { submit.disabled = sending; submit.classList.toggle("sending", sending); form.setAttribute("aria-busy", String(sending)); }
 function addTypingIndicator() { const indicator = el("div", { className: "typing-indicator", role: "status", "aria-label": "EduPulse coach is thinking" }, [el("i"), el("i"), el("i")]); messages.append(indicator); messages.scrollTop = messages.scrollHeight; return indicator; }
 form.addEventListener("submit", async (event) => {
@@ -32,4 +32,5 @@ form.addEventListener("submit", async (event) => {
 input.addEventListener("input", resizeInput);
 input.addEventListener("keydown", (event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); form.requestSubmit(); } });
 for (const starter of document.querySelectorAll("[data-prompt]")) starter.addEventListener("click", () => { input.value = starter.dataset.prompt; resizeInput(); input.focus(); });
+resizeInput();
 await ensureConversation(); await renderMessages();
