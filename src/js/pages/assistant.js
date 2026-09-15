@@ -1,9 +1,9 @@
 import { requireSession } from "../auth/guards.js";
 import { bindLogout } from "../auth/logout.js?v=20260812-nav";
-import { createConversation, listConversations, listMessages, sendCoachMessage } from "../services/chat.service.js";
+import { createConversation, listConversations, listMessages, sendCoachMessage } from "../services/chat.service.js?v=20260915-stream";
 import { getCurrentSemester } from "../services/semester.service.js";
 import { el, formattedText } from "../utils/dom.js";
-import { showMessage, userMessage } from "../utils/forms.js";
+import { showMessage, userMessage } from "../utils/forms.js?v=20260915-ai";
 
 const session = await requireSession({ requireOnboarding: true });
 
@@ -16,6 +16,7 @@ if (session) {
     const role = message.role === "assistant" ? "assistant" : "user";
     const bubble = el("article", { className: `chat-message ${role}` }, [el("div", { className: "message-meta" }, [el("strong", { text: role === "assistant" ? "EduPulse coach" : "You" }), el("time", { text: messageTime(message.created_at) })]), formattedText(message.content)]);
     messages.append(bubble); messages.scrollTo({ top: messages.scrollHeight, behavior: "smooth" });
+    return bubble;
   }
   function showWelcome() {
     messages.append(el("section", { className: "coach-welcome" }, [el("div", { className: "welcome-mark", text: "✦" }), el("h2", { text: "Let’s make your next step clear." }), el("p", { text: "Ask me to explain your current performance, compare priorities, or turn your academic signals into a practical plan." })]));
@@ -28,8 +29,22 @@ if (session) {
   form.addEventListener("submit", async (event) => {
     event.preventDefault(); const text = input.value.trim(); if (!text || submit.disabled) return;
     document.querySelector("#form-message").hidden = true; starters.hidden = true; input.value = ""; resizeInput(); appendMessage({ role: "user", content: text }); setSending(true); const typing = addTypingIndicator();
-    try { const response = await sendCoachMessage(conversationId, text); typing.remove(); appendMessage(response); }
-    catch (error) { typing.remove(); showMessage(userMessage(error, "The academic coach is unavailable right now. Please try again shortly."), "error"); input.value = text; resizeInput(); }
+    let reply; let partial = "";
+    try {
+      const response = await sendCoachMessage(conversationId, text, { onDelta(delta) {
+        partial += delta; typing.remove();
+        if (!reply) { reply = appendMessage({ role: "assistant", content: "" }); reply.setAttribute("aria-busy", "true"); }
+        reply.querySelector("p").textContent = partial;
+        messages.scrollTop = messages.scrollHeight;
+      } });
+      typing.remove(); const complete = appendMessage(response);
+      if (reply) { reply.replaceWith(complete); messages.scrollTop = messages.scrollHeight; }
+    }
+    catch (error) {
+      typing.remove();
+      if (reply) { reply.removeAttribute("aria-busy"); reply.append(el("small", { text: "Reply interrupted. Please try again." })); }
+      showMessage(userMessage(error, "The academic coach is unavailable right now. Please try again shortly."), "error"); input.value = text; resizeInput();
+    }
     finally { setSending(false); input.focus(); }
   });
   input.addEventListener("input", resizeInput);

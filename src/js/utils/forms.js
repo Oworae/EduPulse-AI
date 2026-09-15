@@ -1,3 +1,16 @@
+const aiMessages = {
+  ai_session_expired: "Your session has expired. Please sign in again.",
+  ai_timeout: "AI support took too long to reply. Please try again shortly.",
+  ai_interrupted: "The AI reply was interrupted. Please try again.",
+  ai_busy: "AI support is busy right now. Your academic data is safe—please try again shortly.",
+  ai_unavailable: "AI support is temporarily unavailable. Your academic records and calculations are unaffected.",
+  ai_invalid: "We couldn’t complete that AI request. Please review your input and try again.",
+  ai_network: "We couldn’t reach AI support. Check your connection and try again.",
+};
+export function aiRequestError(code) {
+  return Object.assign(new Error(aiMessages[code] ?? aiMessages.ai_unavailable), { code });
+}
+
 export function showMessage(message, type = "info") {
   const element = document.querySelector("#form-message");
   if (!element) return;
@@ -11,6 +24,7 @@ export function showMessage(message, type = "info") {
 export function userMessage(error, fallback = "Something went wrong. Please try again.") {
   const code = String(error?.code ?? "").toLowerCase();
   const detail = String(error?.message ?? "").toLowerCase();
+  if (Object.hasOwn(aiMessages, code)) return aiMessages[code];
   if (code === "invalid_credentials" || /invalid login credentials/.test(detail)) return "The email or password is incorrect.";
   if (code === "email_not_confirmed" || /email not confirmed/.test(detail)) return "Confirm your email address before signing in.";
   if (code === "user_already_exists" || /already registered|already exists/.test(detail)) return "An account already exists for this email address.";

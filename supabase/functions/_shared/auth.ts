@@ -9,10 +9,13 @@ export type AuthContext = {
   userClient: SupabaseClient;
   adminClient: SupabaseClient;
 };
-export async function requireAuth(req: Request): Promise<AuthContext> {
+export async function requireAuth(
+  req: Request,
+  signal?: AbortSignal,
+): Promise<AuthContext> {
   const authorization = req.headers.get("Authorization");
   if (!authorization?.startsWith("Bearer ")) {
-    throw new Error("Authentication required");
+    throw new Error("Authentication required: missing session");
   }
   const url = Deno.env.get("SUPABASE_URL");
   const anon = Deno.env.get("SUPABASE_ANON_KEY");
@@ -20,12 +23,21 @@ export async function requireAuth(req: Request): Promise<AuthContext> {
   if (!url || !anon || !service) {
     throw new Error("Server configuration is incomplete");
   }
+  const requestFetch: typeof fetch = (input, init) =>
+    fetch(input, {
+      ...init,
+      signal: signal && init?.signal
+        ? AbortSignal.any([signal, init.signal])
+        : signal ?? init?.signal,
+    });
   const userClient = createClient(url, anon, {
-    global: { headers: { Authorization: authorization } },
-    auth: { persistSession: false },
+    global: { headers: { Authorization: authorization }, fetch: requestFetch },
+    auth: { persistSession: false, autoRefreshToken: false },
   });
   const { data, error } = await userClient.auth.getUser();
-  if (error || !data.user) throw new Error("Invalid or expired session");
+  if (error || !data.user) {
+    throw new Error("Authentication required: invalid or expired session");
+  }
   const { data: activeSession, error: sessionError } = await userClient.rpc(
     "is_app_session_active",
   );
@@ -33,7 +45,15 @@ export async function requireAuth(req: Request): Promise<AuthContext> {
     throw new Error("Authentication required: invalid or expired session");
   }
   const adminClient = createClient(url, service, {
-    auth: { persistSession: false },
+    global: { fetch: requestFetch },
+    auth: { persistSession: false, autoRefreshToken: false },
   });
   return { user: data.user, userClient, adminClient };
+}
+
+export async function requireActiveSession(userClient: SupabaseClient) {
+  const { data, error } = await userClient.rpc("is_app_session_active");
+  if (error || data !== true) {
+    throw new Error("Authentication required: invalid or expired session");
+  }
 }

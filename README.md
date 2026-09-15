@@ -40,6 +40,14 @@ Set `GEMINI_API_KEY` and optionally `GEMINI_MODEL` as Supabase project secrets. 
 
 The production default is `gemini-3.6-flash`, a generally available model supported by Gemini's GenerateContent API.
 
+## AI response behaviour
+
+Routine Gemini 3 guidance uses low thinking. Chat streams text as it is generated, with an explicit completion event only after both conversation messages are saved in one database insert. A partial or interrupted reply is marked for retry. JSON insight responses retain their structured validation and existing cache.
+
+Generation has one 45-second deadline covering at most three attempts. Temporary 429/500/502/503/504 failures use exponential backoff and respect short `Retry-After` values; long waits are returned to the user. Once chat text has appeared, generation is never retried automatically. The full AI request has a 60-second server deadline and a 70-second browser deadline. Leaving the page cancels the request. Sessions are checked again before saving generated content.
+
+Server timing logs include authentication, context loading, generation, persistence and first-text durations, without prompts, answers, student identifiers or credentials. Run `deno test --allow-env --node-modules-dir=none --no-lock supabase/functions/_shared/gemini.test.ts` and `npm run test:e2e -- tests/e2e/ai.spec.js` to verify retries, streaming, timeouts, cancellation, persistence and revocation. Deploy updated Edge Functions before publishing the frontend; the chat endpoint retains JSON support for older clients.
+
 ## Security decisions
 
 - Student API access requires an active app session as well as row ownership. Migration `011_enforce_app_sessions.sql` enforces 15 minutes without recorded interaction, an eight-hour lifetime and immediate app-session revocation; refreshed JWTs cannot restart those limits.

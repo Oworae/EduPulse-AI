@@ -1,7 +1,8 @@
 import { corsHeaders } from "../_shared/cors.ts";
-import { requireAuth } from "../_shared/auth.ts";
+import { requireActiveSession, requireAuth } from "../_shared/auth.ts";
 import { callGemini, modelName } from "../_shared/gemini.ts";
-import { errorResponse, json } from "../_shared/responses.ts";
+import { aiError, errorResponse, json } from "../_shared/responses.ts";
+import { requestTiming } from "../_shared/timing.ts";
 import { objectBody, uuid } from "../_shared/validation.ts";
 
 const allowedTypes = new Set([
@@ -52,16 +53,24 @@ Deno.serve(async (req) => {
     return new Response("ok", { headers: corsHeaders });
   }
   if (req.method !== "POST") return errorResponse("Method not allowed", 405);
+  const timing = requestTiming(req, "generate-insight");
   try {
-    const { user, userClient, adminClient } = await requireAuth(req);
+    const { user, userClient, adminClient } = await timing.measure(
+      "auth",
+      () => requireAuth(req, timing.signal),
+    );
     const body = objectBody(await req.json());
     if (typeof body.type !== "string" || !allowedTypes.has(body.type)) {
       throw new Error("Unsupported insight type");
     }
     const courseId = uuid(body.course_id, "course_id", true);
-    const { data: semester, error: semesterError } = await userClient.from(
-      "semesters",
-    ).select("id").eq("is_current", true).single();
+    const { data: semester, error: semesterError } = await timing.measure(
+      "ownership",
+      async () =>
+        await userClient.from(
+          "semesters",
+        ).select("id").eq("is_current", true).single(),
+    );
     if (semesterError || !semester) {
       throw new Error("Current semester not found");
     }
@@ -77,19 +86,22 @@ Deno.serve(async (req) => {
       { data: courses },
       { data: signals },
       { data: checkins },
-    ] = await Promise.all([
-      userClient.rpc("get_semester_metrics", { p_semester_id: semester.id }),
-      userClient.from("v_semester_course_summary").select(
-        "course_id,course_name,current_percentage,attendance_percentage,target_percentage,difference_from_target",
-      ).eq("semester_id", semester.id).limit(30),
-      userClient.from("academic_signals").select(
-        "signal_type,severity,title,explanation,evidence",
-      ).eq("semester_id", semester.id).eq("status", "active").limit(20),
-      userClient.from("weekly_checkins").select(
-        "week_start,study_hours,workload,confidence,focus",
-      ).eq("semester_id", semester.id).order("week_start", { ascending: false })
-        .limit(4),
-    ]);
+    ] = await timing.measure("context", () =>
+      Promise.all([
+        userClient.rpc("get_semester_metrics", { p_semester_id: semester.id }),
+        userClient.from("v_semester_course_summary").select(
+          "course_id,course_name,current_percentage,attendance_percentage,target_percentage,difference_from_target",
+        ).eq("semester_id", semester.id).limit(30),
+        userClient.from("academic_signals").select(
+          "signal_type,severity,title,explanation,evidence",
+        ).eq("semester_id", semester.id).eq("status", "active").limit(20),
+        userClient.from("weekly_checkins").select(
+          "week_start,study_hours,workload,confidence,focus",
+        ).eq("semester_id", semester.id).order("week_start", {
+          ascending: false,
+        })
+          .limit(4),
+      ]));
     const context = {
       type: body.type,
       course_id: courseId,
@@ -117,13 +129,21 @@ Deno.serve(async (req) => {
     const { data: cached } = await cachedQuery.maybeSingle();
     if (
       cached && (!cached.expires_at || new Date(cached.expires_at) > new Date())
-    ) return json({ insight: cached, cached: true });
+    ) {
+      timing.finish("cached");
+      return json({ insight: cached, cached: true });
+    }
     const prompt =
       `You are EduPulse AI, a warm and encouraging personal academic coach speaking directly to the student. Always use second-person language such as "you" and "your". Never refer to them as "the student" and never sound like an institutional report. Start with what their results mean, acknowledge genuine progress without exaggeration, and explain the most useful next step in clear everyday language. Keep the summary to 2-3 concise sentences. Make every observation natural, specific, and directly addressed to the student. Recommendations must be practical and phrased as supportive actions they can take. Explain only the deterministic academic context supplied below. Do not invent scores, attendance, grades, diagnoses, or official predictions. Academic Pulse is an informal EduPulse indicator. Return strict JSON with title, summary, observations (string array), and recommended_actions (array of {title, priority 1-3, reason}). Context: ${
         JSON.stringify(context)
       }`;
     const generated = validateInsight(
-      JSON.parse(await callGemini(prompt, true)),
+      JSON.parse(
+        await timing.measure(
+          "generation",
+          () => callGemini(prompt, true, { signal: timing.signal }),
+        ),
+      ),
     );
     const insightRow = {
       user_id: user.id,
@@ -138,9 +158,17 @@ Deno.serve(async (req) => {
       context_hash: contextHash,
       expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
     };
-    const { data: insight, error: saveError } = await adminClient.from(
-      "ai_insights",
-    ).insert(insightRow).select().single();
+    await timing.measure(
+      "session_recheck",
+      () => requireActiveSession(userClient),
+    );
+    const { data: insight, error: saveError } = await timing.measure(
+      "persist",
+      async () =>
+        await adminClient.from(
+          "ai_insights",
+        ).insert(insightRow).select().single(),
+    );
     if (saveError) throw saveError;
     const actions = generated.recommended_actions.map((a) => ({
       user_id: user.id,
@@ -155,13 +183,14 @@ Deno.serve(async (req) => {
       const { error } = await adminClient.from("study_actions").insert(actions);
       if (error) throw error;
     }
+    timing.finish("completed");
     return json({ insight: { ...insight, ...generated }, cached: false });
   } catch (error) {
+    const failure = aiError(error);
+    timing.finish(failure.error);
     return errorResponse(
-      error,
-      error instanceof Error && error.message.toLowerCase().includes("session")
-        ? 401
-        : 400,
+      failure.status === 500 ? error : failure.error,
+      failure.status === 500 ? 400 : failure.status,
     );
   }
 });

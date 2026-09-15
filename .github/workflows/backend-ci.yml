@@ -56,6 +56,8 @@ jobs:
           deno-version: v2.x
       - run: deno fmt --check supabase/functions
       - run: deno check --node-modules-dir=none --no-lock supabase/functions/recompute-pulse/index.ts supabase/functions/generate-insight/index.ts supabase/functions/academic-coach/index.ts
+      - name: Check AI streaming, retry, timeout and revocation behaviour
+        run: deno test --allow-env --node-modules-dir=none --no-lock supabase/functions/_shared/gemini.test.ts
       - name: Reject committed backend secrets
         run: |
           if git grep -nE '(sb_secret_[A-Za-z0-9_-]{16,}|postgresql://[^[:space:]]+:[^[:space:]@]+@db\.[a-z0-9-]+\.supabase\.co)' -- ':!*.example'; then

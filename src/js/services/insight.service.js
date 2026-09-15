@@ -1,5 +1,5 @@
 import { supabase } from "../config/supabase.js";
-import { invokeFunction } from "./function.service.js";
+import { invokeFunction } from "./function.service.js?v=20260915-stream";
 
 export async function generateInsight(type = "home_summary", courseId = null) {
   const body = { type }; if (courseId) body.course_id = courseId;

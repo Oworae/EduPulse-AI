@@ -1,9 +1,9 @@
 import { requireSession } from "../auth/guards.js";
 import { bindLogout } from "../auth/logout.js?v=20260812-nav";
-import { generateInsight, insightContent, listInsights, listStudyActions, updateStudyAction } from "../services/insight.service.js";
+import { generateInsight, insightContent, listInsights, listStudyActions, updateStudyAction } from "../services/insight.service.js?v=20260915-stream";
 import { getCurrentSemester } from "../services/semester.service.js";
 import { el } from "../utils/dom.js";
-import { setBusy, showMessage, userMessage } from "../utils/forms.js";
+import { setBusy, showMessage, userMessage } from "../utils/forms.js?v=20260915-ai";
 
 const session = await requireSession({ requireOnboarding: true });
 

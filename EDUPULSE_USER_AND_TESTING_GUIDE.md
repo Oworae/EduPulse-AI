@@ -271,6 +271,8 @@ The result may be reused if the academic context has not changed. Gemini does no
 3. Press Enter or use the send button.
 4. Review the response against the academic facts displayed elsewhere.
 
+The reply appears progressively while the coach is responding. A completed reply is saved with your question. If the connection breaks, any visible text is marked **Reply interrupted** and your question is restored so you can retry. The exchange is saved only after generation finishes; after a connection loss, reload to check conversation history before retrying because the server may have completed saving. Temporary service overload may be retried briefly before any reply text appears; persistent overload or a timeout produces a friendly message instead of leaving the send button disabled indefinitely.
+
 Useful questions include:
 
 - “What should I focus on this week?”
@@ -645,6 +647,14 @@ Use non-sensitive sample data and test:
 7. **Provider outage/configuration:** test without a Gemini key in an isolated environment. Expected: a controlled configuration error without secret leakage.
 
 Record inaccurate or unsafe outputs as defects even when the HTTP request succeeds.
+
+### 30.1 AI response and failure checks
+
+Run `npm run test:e2e -- tests/e2e/ai.spec.js` for desktop and mobile checks against a local streaming test server, with mocked authentication and no real Gemini calls. Confirm incremental text before completion, Unicode and safe formatting, overload notices, partial-response marking, input restoration, timeouts after response headers, deployment compatibility and cancellation when leaving the page.
+
+Run `deno test --allow-env --node-modules-dir=none --no-lock supabase/functions/_shared/gemini.test.ts` for server checks with mocked provider and database requests. Confirm at most three generation attempts, no retry after text appears, `Retry-After` handling, bounded header/body waits, rejection of incomplete output, saving both chat messages together, failed-save reporting and revocation before persistence.
+
+The generation deadline is 45 seconds including retries, the whole AI request deadline is 60 seconds on the server, and the browser stops waiting after 70 seconds. Routine Gemini 3 requests use low thinking. JSON insights are shown only after complete output validation. In server logs, compare **AI request timing** and **Gemini request timing** to distinguish authentication/context delay from provider generation delay. Timing events must contain no student content or credentials. After deployment, use a dedicated account to check that streaming starts before completion and the completed exchange survives a reload.
 
 ## 31. GitHub Actions Testing
 
