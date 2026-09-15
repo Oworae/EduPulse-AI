@@ -26,6 +26,12 @@ export async function requireAuth(req: Request): Promise<AuthContext> {
   });
   const { data, error } = await userClient.auth.getUser();
   if (error || !data.user) throw new Error("Invalid or expired session");
+  const { data: activeSession, error: sessionError } = await userClient.rpc(
+    "is_app_session_active",
+  );
+  if (sessionError || activeSession !== true) {
+    throw new Error("Authentication required: invalid or expired session");
+  }
   const adminClient = createClient(url, service, {
     auth: { persistSession: false },
   });

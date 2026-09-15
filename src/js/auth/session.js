@@ -1,9 +1,10 @@
 import { supabase } from "../config/supabase.js";
+import { verifySession, endSession } from "./session-manager.js";
 
 export async function currentSession() {
   const { data, error } = await supabase.auth.getSession();
-  if (error) throw error;
-  return data.session;
+  if (error) { await endSession("verification-failed", { revoke: false }); return null; }
+  return data.session ? verifySession(data.session) : null;
 }
 
 export async function routeSignedInUser() {

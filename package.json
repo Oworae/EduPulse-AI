@@ -1,0 +1,12 @@
+{
+  "name": "edupulse-ai",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:e2e": "playwright test",
+    "test:e2e:live": "PLAYWRIGHT_BASE_URL=https://oworae.github.io/EduPulse-AI/ playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.55.0"
+  }
+}

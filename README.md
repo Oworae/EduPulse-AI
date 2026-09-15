@@ -42,6 +42,12 @@ The production default is `gemini-3.6-flash`, a generally available model suppor
 
 ## Security decisions
 
+- Student API access requires an active app session as well as row ownership. Migration `011_enforce_app_sessions.sql` enforces 15 minutes without recorded interaction, an eight-hour lifetime and immediate app-session revocation; refreshed JWTs cannot restart those limits.
+- Browser activity is batched within five seconds, with a warning one minute before expiry. Logout clears student content and credentials and redirects tabs sharing that session.
+- Deploy the session migration and updated Edge Functions before publishing the updated frontend. No paid Supabase session feature is required for these application checks. Existing sessions already beyond either deadline must sign in again.
+- `supabase/config.toml` sets a 15-minute JWT lifetime and an eight-character password minimum for local Auth. Apply the equivalent values separately in hosted Auth settings; the file does not configure the hosted project automatically.
+- Run `tests/database/sessions.test.sql` alongside the existing database checks and `tests/e2e/security.spec.js` for desktop and mobile session behavior.
+
 - Every public table has RLS enabled.
 - Views use `security_invoker` so underlying table policies remain effective.
 - Composite foreign keys prevent a child row from claiming one user while referencing another user's parent.

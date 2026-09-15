@@ -37,6 +37,10 @@ jobs:
         env:
           LOCAL_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
         run: psql "$LOCAL_DATABASE_URL" -v ON_ERROR_STOP=1 -f tests/database/rls.test.sql
+      - name: Run session expiry and revocation checks
+        env:
+          LOCAL_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
+        run: psql "$LOCAL_DATABASE_URL" -v ON_ERROR_STOP=1 -f tests/database/sessions.test.sql
       - name: Stop local services
         if: always()
         run: supabase stop --no-backup
@@ -51,7 +55,7 @@ jobs:
         with:
           deno-version: v2.x
       - run: deno fmt --check supabase/functions
-      - run: deno check supabase/functions/recompute-pulse/index.ts supabase/functions/generate-insight/index.ts supabase/functions/academic-coach/index.ts
+      - run: deno check --node-modules-dir=none --no-lock supabase/functions/recompute-pulse/index.ts supabase/functions/generate-insight/index.ts supabase/functions/academic-coach/index.ts
       - name: Reject committed backend secrets
         run: |
           if git grep -nE '(sb_secret_[A-Za-z0-9_-]{16,}|postgresql://[^[:space:]]+:[^[:space:]@]+@db\.[a-z0-9-]+\.supabase\.co)' -- ':!*.example'; then
@@ -81,3 +85,27 @@ jobs:
             echo 'A backend credential appears in frontend source.' >&2
             exit 1
           fi
+
+  browser-e2e:
+    name: Desktop and mobile browser tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - name: Upload failure evidence
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 7
