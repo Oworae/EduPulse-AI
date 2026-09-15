@@ -56,11 +56,11 @@ jobs:
           deno-version: v2.x
       - run: deno fmt --check supabase/functions
       - run: deno check --node-modules-dir=none --no-lock supabase/functions/recompute-pulse/index.ts supabase/functions/generate-insight/index.ts supabase/functions/academic-coach/index.ts
-      - name: Check AI streaming, retry, timeout and revocation behaviour
+      - name: Check AI fallback, streaming, retry, timeout and revocation behaviour
         run: deno test --allow-env --node-modules-dir=none --no-lock supabase/functions/_shared/gemini.test.ts
       - name: Reject committed backend secrets
         run: |
-          if git grep -nE '(sb_secret_[A-Za-z0-9_-]{16,}|postgresql://[^[:space:]]+:[^[:space:]@]+@db\.[a-z0-9-]+\.supabase\.co)' -- ':!*.example'; then
+          if git grep -qE '(sk-ant-api[0-9]{2}-[A-Za-z0-9_-]{20,}|sb_secret_[A-Za-z0-9_-]{16,}|postgresql://[^[:space:]]+:[^[:space:]@]+@db\.[a-z0-9-]+\.supabase\.co)' -- ':!*.example'; then
             echo 'A backend credential appears to be committed.' >&2
             exit 1
           fi
@@ -83,7 +83,7 @@ jobs:
           done
       - name: Reject backend credentials in frontend
         run: |
-          if git grep -nE '(SUPABASE_SERVICE_ROLE_KEY|GEMINI_API_KEY|sb_secret_|postgresql://)' -- '*.html' 'src/**'; then
+          if git grep -qE '(SUPABASE_SERVICE_ROLE_KEY|GEMINI_API_KEY|ANTHROPIC_API_KEY|sk-ant-|sb_secret_|postgresql://)' -- '*.html' 'src/**'; then
             echo 'A backend credential appears in frontend source.' >&2
             exit 1
           fi

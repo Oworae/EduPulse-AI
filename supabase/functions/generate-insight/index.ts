@@ -1,6 +1,6 @@
 import { corsHeaders } from "../_shared/cors.ts";
 import { requireActiveSession, requireAuth } from "../_shared/auth.ts";
-import { callGemini, modelName } from "../_shared/gemini.ts";
+import { callAI } from "../_shared/ai.ts";
 import { aiError, errorResponse, json } from "../_shared/responses.ts";
 import { requestTiming } from "../_shared/timing.ts";
 import { objectBody, uuid } from "../_shared/validation.ts";
@@ -137,14 +137,11 @@ Deno.serve(async (req) => {
       `You are EduPulse AI, a warm and encouraging personal academic coach speaking directly to the student. Always use second-person language such as "you" and "your". Never refer to them as "the student" and never sound like an institutional report. Start with what their results mean, acknowledge genuine progress without exaggeration, and explain the most useful next step in clear everyday language. Keep the summary to 2-3 concise sentences. Make every observation natural, specific, and directly addressed to the student. Recommendations must be practical and phrased as supportive actions they can take. Explain only the deterministic academic context supplied below. Do not invent scores, attendance, grades, diagnoses, or official predictions. Academic Pulse is an informal EduPulse indicator. Return strict JSON with title, summary, observations (string array), and recommended_actions (array of {title, priority 1-3, reason}). Context: ${
         JSON.stringify(context)
       }`;
-    const generated = validateInsight(
-      JSON.parse(
-        await timing.measure(
-          "generation",
-          () => callGemini(prompt, true, { signal: timing.signal }),
-        ),
-      ),
+    const response = await timing.measure(
+      "generation",
+      () => callAI(prompt, true, { signal: timing.signal }),
     );
+    const generated = validateInsight(JSON.parse(response.text));
     const insightRow = {
       user_id: user.id,
       semester_id: semester.id,
@@ -153,7 +150,7 @@ Deno.serve(async (req) => {
       title: generated.title,
       summary: generated.summary,
       body: JSON.stringify(generated),
-      model_name: modelName(),
+      model_name: response.model,
       prompt_version: promptVersion,
       context_hash: contextHash,
       expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),

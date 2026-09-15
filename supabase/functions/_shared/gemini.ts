@@ -4,7 +4,11 @@ const endpoint = "https://generativelanguage.googleapis.com/v1beta/models";
 const GENERATION_TIMEOUT_MS = 45_000;
 const MAX_ATTEMPTS = 3;
 const RETRYABLE = new Set([429, 500, 502, 503, 504]);
-type Options = { signal?: AbortSignal; timeoutMs?: number };
+type Options = {
+  signal?: AbortSignal;
+  timeoutMs?: number;
+  maxAttempts?: number;
+};
 type Candidate = {
   content?: { parts?: { text?: string; thought?: boolean }[] };
   finishReason?: string;
@@ -53,7 +57,11 @@ async function generate(
   prompt: string,
   jsonMode: boolean,
   onText: ((text: string) => void) | undefined,
-  { signal: parentSignal, timeoutMs = GENERATION_TIMEOUT_MS }: Options,
+  {
+    signal: parentSignal,
+    timeoutMs = GENERATION_TIMEOUT_MS,
+    maxAttempts = MAX_ATTEMPTS,
+  }: Options,
 ): Promise<string> {
   const key = Deno.env.get("GEMINI_API_KEY");
   const model = modelName();
@@ -75,7 +83,7 @@ async function generate(
   let firstTextMs: number | undefined;
   let outcome = "failed";
   try {
-    for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
       signal.throwIfAborted();
       attempts++;
       try {
@@ -157,7 +165,7 @@ async function generate(
         const transient = error instanceof ProviderError
           ? RETRYABLE.has(error.status)
           : error instanceof TypeError;
-        if (!transient || deliveredText || attempt === MAX_ATTEMPTS - 1) {
+        if (!transient || deliveredText || attempt === maxAttempts - 1) {
           throw error;
         }
         const delay = Math.max(
@@ -187,7 +195,7 @@ async function generate(
     if (error instanceof Error && error.message.startsWith("AI_SERVICE_")) {
       throw error;
     }
-    throw new Error("AI_SERVICE_UNAVAILABLE");
+    throw new Error("AI_SERVICE_UNAVAILABLE", { cause: error });
   } finally {
     clearTimeout(deadline);
     console.info("Gemini request timing", {
@@ -215,4 +223,12 @@ export function streamGemini(
 }
 export function modelName() {
   return Deno.env.get("GEMINI_MODEL") ?? "gemini-3.6-flash";
+}
+
+export function canFallback(error: unknown) {
+  return error instanceof ProviderError
+    ? RETRYABLE.has(error.status)
+    : error instanceof Error &&
+      (error.message === "AI_SERVICE_TIMEOUT" ||
+        error.cause instanceof TypeError);
 }

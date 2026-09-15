@@ -1,6 +1,6 @@
 import { corsHeaders } from "../_shared/cors.ts";
 import { requireActiveSession, requireAuth } from "../_shared/auth.ts";
-import { callGemini, streamGemini } from "../_shared/gemini.ts";
+import { callAI, streamAI } from "../_shared/ai.ts";
 import { aiError, errorResponse, json } from "../_shared/responses.ts";
 import { requestTiming } from "../_shared/timing.ts";
 import { objectBody, uuid } from "../_shared/validation.ts";
@@ -85,14 +85,14 @@ export async function handleCoachRequest(req: Request) {
         "generation",
         () =>
           onText
-            ? streamGemini(prompt, (text) => {
+            ? streamAI(prompt, (text) => {
               timing.firstText();
               onText(text);
             }, { signal: timing.signal })
-            : callGemini(prompt, false, { signal: timing.signal }),
+            : callAI(prompt, false, { signal: timing.signal }),
       );
       return await timing.measure("persist", async () => {
-        // Revocation or expiry while Gemini is running must block admin writes.
+        // Revocation or expiry during generation must block admin writes.
         await requireActiveSession(userClient);
         const { error: conversationError } = await adminClient.from(
           "chat_conversations",
@@ -115,7 +115,7 @@ export async function handleCoachRequest(req: Request) {
               conversation_id: conversationId,
               user_id: user.id,
               role: "assistant",
-              content: answer,
+              content: answer.text,
               created_at: new Date(
                 Math.max(Date.now(), Date.parse(userMessageTime) + 1),
               ).toISOString(),
